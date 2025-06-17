@@ -129,6 +129,7 @@ section{
     text-align: center;
     font-size: 50px;
     cursor:default;
+    font-weight: bold;
 }
 
 .info-box p{
