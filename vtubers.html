@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vtuber Search</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./responsivo.css">
+</head>
+
+<body>
+    <header>
+        <a href="./index.html" class="logo">Vtubers</a>
+
+        <div class="nav">
+            <a href="./index.html">Home</a>
+            <a href="./vtubers.html">Vtubers</a>
+            <a href="./about.html">About</a>
+        </div>
+
+        <div class="nav-responsive">
+            <a href="./index.html">Home</a>
+            <a href="./vtubers.html">Vtubers</a>
+            <a href="./about.html">About</a>
+        </div>
+
+        <div class="menu-hamburguer">
+            <div class="bar1"></div>
+            <div class="bar2"></div>
+            <div class="bar3"></div>
+        </div>
+    </header>
+
+    <section class="filtro, cor-fundo">
+        <h1>Vtubers</h1>
+
+        <form id="filter-form">
+
+            <!-- Filtro por Tags -->
+            <label for="tag-filter">Filtrar por Tag:</label>
+            <select id="tag-filter">
+                <option value="">Todas</option>
+                <option value="just-chatting">Just Chatting</option>
+                <option value="gameplay">Gameplay</option>
+                <option value="react">React</option>
+                <option value="asmr">ASMR</option>
+                <option value="musica">Música</option>
+                <option value="arte">Arte</option>
+            </select>
+
+            <!-- Filtro por Horário -->
+            <label for="time-filter">Filtrar por Horário:</label>
+            <select id="time-filter">
+                <option value="">Todos</option>
+                <option value="manha">Manhã</option>
+                <option value="tarde">Tarde</option>
+                <option value="noite">Noite</option>
+                <option value="madrugada">Madrugada</option>
+            </select>
+
+            <!-- Filtro por Plataforma de Streaming -->
+            <label for="plat-filter">Filtrar por Plataforma</label>
+            <select id="plat-filter">
+                <option value="">Todos</option>
+                <option value="youtube">Youtube</option>
+                <option value="twitch">Twitch</option>
+                <option value="kick">Kick</option>
+            </select>
+
+            <!-- Filtrando por Idioma -->
+            <label for="lang-filter">Filtrar Idioma:</label>
+            <select id="lang-filter">
+                <option value="">Todos</option>
+                <option value="ingles">Inglês</option>
+                <option value="portugues">Português</option>
+            </select>
+
+            <button class="submit" type="submit">Buscar</button>
+        </form>
+
+        <!-- Lista de Vtubers -->
+        <div class="items">
+
+            <!-- Nyhzumi -->
+            <div class="item" data-tags="asmr, gameplay, just-chatting, react" data-time="noite, tarde"
+                data-plat="twitch" data-lang="portugues, ingles">
+                <div><a href="./nyhzumi.html">
+                        <img class="item-img" src="./img/nyhzumi/nyhzumi1.png" alt="">
+                        <h3>Nyhzumi</h3>
+                        <p><span>Tags:</span> Asmr, Just Chatting, Gameplay, React</p>
+                        <p><span>Horário:</span> Noite, Tarde</p>
+                        <p><span>Plataforma:</span> Twitch</p>
+                        <p><span>Idioma:</span> Português ,Inglês</p>
+                </div></a>
+            </div>
+
+            <!-- Toshiruz -->
+            <div class="item" data-tags="gameplay, just-chatting, react" data-time="noite, tarde"
+                data-plat="twitch, youtube" data-lang="portugues, ingles">
+                <div><a href="./toshiruz.html">
+                        <img class="item-img" src="./img/toshiruz/toshiruz1.png" alt="">
+                        <h3>Toshiruz</h3>
+                        <p><span>Tags:</span>Just Chatting, Gameplay, React</p>
+                        <p><span>Horário:</span> Noite, Tarde</p>
+                        <p><span>Plataforma:</span> Twitch, Youtube</p>
+                        <p><span>Idioma:</span> Português ,Inglês</p>
+                </div></a>
+            </div>
+
+            <!-- SquChan -->
+            <div class="item" data-tags="asmr, gameplay, just-chatting, react, arte" data-time="noite, tarde"
+                data-plat="twitch" data-lang="ingles">
+                <div><a href="./squchan.html">
+                        <img class="item-img" src="./img/squchan/squchan1.png" alt="">
+                        <h3>SquChan</h3>
+                        <p><span>Tags:</span> Asmr, Just Chatting, Gameplay, React, Arte</p>
+                        <p><span>Horário:</span> Noite, Tarde</p>
+                        <p><span>Plataforma:</span> Twitch</p>
+                        <p><span>Idioma:</span> Inglês</p>
+                    </a></div>
+            </div>
+
+            <!-- DanteWill -->
+            <div class="item" data-tags="gameplay, just-chatting, react" data-time="noite" data-plat="youtube"
+                data-lang="portugues">
+                <div><a href="./dantewill.html">
+                        <img class="item-img" src="./img/dantewill/dantewill1.png" alt="">
+                        <h3>DanteWill</h3>
+                        <p><span>Tags:</span>Just Chatting, Gameplay, React</p>
+                        <p><span>Horário:</span> Noite</p>
+                        <p><span>Plataforma:</span> Youtube</p>
+                        <p><span>Idioma:</span> Português</p>
+                </div></a>
+            </div>
+
+            <!-- Akariinyan -->
+            <div class="item" data-tags="just-chatting, gameplay, react, musica" data-time="tarde, noite"
+                data-plat="twitch, youtube" data-lang="portugues">
+                <div><a href="./akariinyan.html">
+                        <img class="item-img" src="./img/akariinyan/akariinyan1.png" alt="">
+                        <h3>Akariinyan</h3>
+                        <p><span>Tags:</span> Just Chatting, Gameplay, React, Música</p>
+                        <p><span>Horário:</span> Tarde, Noite</p>
+                        <p><span>Plataforma:</span> Twitch, YouTube</p>
+                        <p><span>Idioma:</span> Português</p>
+                    </a></div>
+            </div>
+
+
+            <!-- Gigimurin -->
+            <div class="item" data-tags="just-chatting, gameplay, musica" data-time="noite, madrugada"
+                data-plat="youtube" data-lang="ingles">
+                <div><a href="./gigimurin.html">
+                        <img class="item-img" src="./img/gigimurin/gigi1.png" alt="">
+                        <h3>Gigi Murin</h3>
+                        <p><span>Tags:</span> Just Chatting, Gameplay, Música</p>
+                        <p><span>Horário:</span> Noite, Madrugada</p>
+                        <p><span>Plataforma:</span> Youtube</p>
+                        <p><span>Idioma:</span> Inglês</p>
+                    </a></div>
+            </div>
+
+
+            <!-- Mayuyu -->
+            <div class="item" data-tags="gameplay, just-chatting, react" data-time="tarde" data-plat="twitch, youtube"
+                data-lang="portugues">
+                <div><a href="mayuyu.html">
+                        <img class="item-img" src="./img/mayuyu/mayuyu1.png" alt="">
+                        <h3>Mayuyu</h3>
+                        <p><span>Tags:</span> Just Chatting, Gameplay, React</p>
+                        <p><span>Horário:</span> Tarde</p>
+                        <p><span>Plataforma:</span> Twitch, Youtube</p>
+                        <p><span>Idioma:</span> Português</p>
+                    </a></div>
+            </div>
+
+
+            <!-- VamppyChan -->
+            <div class="item" data-tags="gameplay, just-chatting" data-time="tarde" data-plat="twitch, youtube"
+                data-lang="portugues">
+                <div><a href="vamppychan.html">
+                        <img class="item-img" src="./img/vamppychan/vamppychan1.png" alt="">
+                        <h3>VamppyChan</h3>
+                        <p><span>Tags:</span>Just Chatting, Gameplay</p>
+                        <p><span>Horário:</span> Tarde</p>
+                        <p><span>Plataforma:</span> Twitch, Youtube</p>
+                        <p><span>Idioma:</span> Português</p>
+                    </a></div>
+            </div>
+
+            <!-- Raviel Karim -->
+            <div class="item" data-tags="gameplay, just-chatting, react, musica" data-time="tarde, noite"
+                data-plat="youtube" data-lang="portugues">
+                <div><a href="./ravielkarim.html">
+                        <img class="item-img" src="./img/ravielkarim/ravielkarim1.png" alt="">
+                        <h3>Raviel Karim</h3>
+                        <p><span>Tags:</span>Just Chatting, Gameplay, React, Música</p>
+                        <p><span>Horário:</span> Tarde, Noite</p>
+                        <p><span>Plataforma:</span> Youtube</p>
+                        <p><span>Idioma:</span> Português</p>
+                </div></a>
+            </div>
+
+
+            <!-- Inaishi -->
+            <div class="item" data-tags="gameplay, just-chatting" data-time="tarde" data-plat="twitch"
+                data-lang="portugues">
+                <div><a href="inaishi.html">
+                        <img class="item-img" src="./img/Inaishi/Inaishi1.png" alt="">
+                        <h3>Inaishi</h3>
+                        <p><span>Tags:</span>Just Chatting, Gameplay</p>
+                        <p><span>Horário:</span> Tarde</p>
+                        <p><span>Plataforma:</span> Twitch</p>
+                        <p><span>Idioma:</span> Português</p>
+                    </a></div>
+            </div>
+
+            <!-- Calamarei -->
+            <div class="item" data-tags="gameplay, just-chatting" data-time="tarde" data-plat="twitch"
+                data-lang="ingles">
+                <div><a href="./calamarei.html">
+                        <img class="item-img" src="./img/calamarei/Calamarei1.png" alt="">
+                        <h3>Calamarei</h3>
+                        <p><span>Tags:</span> Just Chatting, Gameplay</p>
+                        <p><span>Horário:</span> Tarde</p>
+                        <p><span>Plataforma:</span> Twitch</p>
+                        <p><span>Idioma:</span> Inglês</p>
+                    </a></div>
+            </div>
+
+
+            <!-- Milkymew -->
+            <div class="item" data-tags="gameplay, just-chatting, react" data-time="manha" data-plat="twitch"
+                data-lang="portugues, ingles">
+                <div><a href="./milkymew.html">
+                        <img class="item-img" src="./img/milkymew/milkymew1.png" alt="">
+                        <h3>Milky Mew</h3>
+                        <p><span>Tags:</span> Just Chatting, Gameplay, React</p>
+                        <p><span>Horário:</span> Manhã</p>
+                        <p><span>Plataforma:</span> Twitch</p>
+                        <p><span>Idioma:</span> Inglês, Português</p>
+                    </a></div>
+            </div>
+
+
+            <!-- Hiniinha -->
+            <div class="item" data-tags="gameplay, just-chatting, react" data-time="tarde, noite" data-plat="youtube"
+                data-lang="portugues">
+                <div><a href="./hiniinha.html">
+                        <img class="item-img" src="./img/hiniinha/hiniinha1.png" alt="">
+                        <h3>Hiniinha</h3>
+                        <p><span>Tags:</span>Just Chatting, Gameplay, React</p>
+                        <p><span>Horário:</span> Tarde, Noite</p>
+                        <p><span>Plataforma:</span> Youtube</p>
+                        <p><span>Idioma:</span> Português</p>
+                    </a></div>
+            </div>
+
+            <!-- Eeiris -->
+            <div class="item" data-tags="gameplay, just-chatting, react" data-time="tarde" data-plat="youtube"
+                data-lang="portugues">
+                <div><a href="./eeiris.html">
+                        <img class="item-img" src="./img/eeiris/eeiris2.png" alt="">
+                        <h3>Eeiris</h3>
+                        <p><span>Tags:</span> Just Chatting, Gameplay, React</p>
+                        <p><span>Horário:</span> Tarde</p>
+                        <p><span>Plataforma:</span> Youtube</p>
+                        <p><span>Idioma:</span> Português</p>
+                    </a></div>
+            </div>
+
+            <!-- Nixi -->
+            <div class="item" data-tags="asmr, gameplay" data-time="tarde, noite" data-plat="twitch" data-lang="ingles">
+                <div><a href="./nixi.html">
+                        <img class="item-img" src="./img/nixi/nixi1.png" alt="">
+                        <h3>Nixi</h3>
+                        <p><span>Tags:</span> Asmr, Gameplay</p>
+                        <p><span>Horário:</span> Tarde, Noite</p>
+                        <p><span>Plataforma:</span> Twitch</p>
+                        <p><span>Idioma:</span> Inglês</p>
+                    </a></div>
+            </div>
+
+             <!-- Naokonn -->
+             <div class="item" data-tags="gameplay, just-chatting" data-time="noite" data-plat="twitch"
+             data-lang="portugues, ingles">
+             <div><a href="./naokonn.html">
+                     <img class="item-img" src="./img/naokonn/naokonn1.png" alt="">
+                     <h3>Naokonn</h3>
+                     <p><span>Tags:</span> Just Chatting, Gameplay</p>
+                     <p><span>Horário:</span> Noite</p>
+                     <p><span>Plataforma:</span> Twitch</p>
+                     <p><span>Idioma:</span> Inglês, Português</p>
+                 </a></div>
+         </div>
+    </section>
+
+    <footer>
+        <p>
+            Copyright &copy; 2025 by &lt;Gilvan Pedro&gt;. All rights reserved.
+        </p>
+    </footer>
+</body>
+<script src="./script.js"></script>
+
+</html>
