@@ -1,0 +1,19 @@
+:root{
+    --port-color: #671bbd;
+}
+
+.info-content h1{
+    color: var(--port-color);
+}
+
+.info-box .span1{
+    color: var(--port-color);
+}
+
+.social-content a{
+    border: solid 1px var(--port-color);
+}
+
+.social-content a:hover{
+    color: var(--port-color);
+}
