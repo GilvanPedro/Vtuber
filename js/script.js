@@ -103,15 +103,6 @@ async function carregarPerfil(id) {
                 </div>` : ''}
             </div>
         </section>`;
-
-    // Trocar o fuso só redesenha horários e agenda (os vídeos não recarregam).
-    perfil.addEventListener('change', event => {
-        if (event.target.id !== 'fuso-perfil') return;
-        escolherFuso(event.target.value);
-        document.getElementById('perfil-fatos').innerHTML = htmlDosFatos(vt);
-        document.getElementById('perfil-agenda').innerHTML = htmlDaAgenda(vt);
-        document.getElementById('fuso-perfil').focus();
-    });
 }
 
 // Conteúdo, horário (no fuso escolhido), plataforma e idioma
@@ -141,11 +132,7 @@ function htmlDaAgenda(vt) {
         <div class="schedule">
             <div class="schedule-head">
                 <span class="fact-label"><i class='bx bx-calendar'></i>${t('perfil.agenda')}</span>
-                <label class="tz-select">
-                    <i class='bx bx-world'></i>
-                    <span class="sr-only">${t('fuso.label')}</span>
-                    <select id="fuso-perfil" class="select">${opcoesDeFuso(fuso)}</select>
-                </label>
+                <span class="schedule-tz"><i class='bx bx-time-five'></i>${esc(nomeDoFuso(fuso))}</span>
             </div>
             <ul class="schedule-list">${linhas}</ul>
         </div>`;

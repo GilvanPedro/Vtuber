@@ -23,6 +23,11 @@
                 <a href="../index.html"data-i18n="nav.home">Home</a>
                 <a href="./vtubers.html"data-i18n="nav.vtubers">Vtubers</a>
                 <a href="./about.html" aria-current="page"data-i18n="nav.sobre">Sobre</a>
+                <label class="tz-switch" title="Fuso horário" data-i18n-title="fuso.label">
+                    <i class='bx bx-time-five'></i>
+                    <span class="sr-only" data-i18n="fuso.label">Fuso horário</span>
+                    <select id="fuso-global"></select>
+                </label>
             </nav>
             <div class="lang-switch" role="group" aria-label="Idioma" data-i18n-aria-label="idioma.aria">
                 <button type="button" data-lang="pt" lang="pt-BR">PT</button>
@@ -84,6 +89,7 @@
     </footer>
 
     <script src="../js/i18n.js"></script>
+    <script src="../js/fusos.js"></script>
     <script src="../js/script.js"></script>
 </body>
 

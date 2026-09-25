@@ -122,14 +122,20 @@
                     </fieldset>
 
                     <fieldset class="editor-section">
-                        <legend>Agenda de lives</legend>
+                        <legend>Horários</legend>
                         <label class="field agenda-fuso">
-                            <span>Fuso horário da vtuber (vale para a agenda abaixo e para o Horário marcado em Categorias)</span>
+                            <span>Fuso horário da vtuber</span>
                             <select name="fuso" class="select" id="fuso-vtuber"></select>
                         </label>
+
+                        <div class="periodos-fusos" id="periodos-fusos" role="group" aria-label="Período das lives em cada fuso"></div>
+                        <label class="check"><input type="checkbox" id="diverso"> Diverso (faz lives em muitos horários diferentes; aparece em todos os períodos)</label>
+                        <small class="hint">Marque o período em um fuso só (de preferência o da vtuber): os outros são convertidos sozinhos e aparecem como <strong>automático</strong>. Se em algum fuso o certo for diferente, é só clicar nos períodos dele para definir à mão.</small>
+
+                        <h3 class="subsecao">Agenda exata (opcional)</h3>
                         <ul class="agenda-rows" id="agenda"></ul>
                         <button type="button" class="btn btn-ghost btn-sm" id="add-horario"><i class='bx bx-plus'></i>Adicionar horário</button>
-                        <small class="hint">O site converte tudo para o fuso escolhido por quem visita (Brasil, EUA ou Europa). Sem agenda, basta marcar o Horário (manhã, tarde...) em Categorias no fuso da vtuber: nos outros fusos o site troca sozinho para o período certo, marcando mais de um quando a live cai em dois. Com agenda, o período é calculado pelos horários das lives.</small>
+                        <small class="hint">Dias e horas das lives no fuso da vtuber. Com a agenda preenchida, o perfil mostra os horários convertidos para o fuso de cada visitante e os períodos acima passam a ser calculados por ela.</small>
                     </fieldset>
 
                     <fieldset class="editor-section">
@@ -204,6 +210,7 @@
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+    <script src="../js/fusos.js"></script>
     <script src="../js/vtubers-data.js"></script>
     <script src="../js/admin.js"></script>
 </body>

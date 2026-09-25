@@ -177,42 +177,8 @@ function cardsCarregando(quantidade) {
 }
 
 // ---------- Fusos horários e agenda de lives ----------
-// Os ids precisam bater com FUSOS em lib/validar.js.
-const FUSOS = [
-    { id: 'America/Sao_Paulo', pt: 'Brasil (Brasília)', en: 'Brazil (Brasília)' },
-    { id: 'America/New_York', pt: 'EUA (Leste)', en: 'USA (Eastern)' },
-    { id: 'America/Los_Angeles', pt: 'EUA (Pacífico)', en: 'USA (Pacific)' },
-    { id: 'Europe/Paris', pt: 'Europa (Central)', en: 'Europe (Central)' }
-];
+// FUSOS, fusoAtual() e escolherFuso() ficam em js/fusos.js (carregado antes deste arquivo).
 const PERIODOS = ['manha', 'tarde', 'noite', 'madrugada', 'diverso'];
-
-// Palpite inicial a partir do fuso do navegador (o mais próximo da lista).
-function fusoDoNavegador() {
-    let fuso = '';
-    try { fuso = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch { /* navegador antigo */ }
-    if (FUSOS.some(f => f.id === fuso)) return fuso;
-    if (fuso.startsWith('Europe/')) return 'Europe/Paris';
-    if (/^America\/(Los_Angeles|Vancouver|Tijuana|Phoenix|Denver|Boise|Edmonton)|^US\/(Pacific|Mountain|Arizona)/.test(fuso)) return 'America/Los_Angeles';
-    if (/^America\/(New_York|Chicago|Detroit|Toronto|Montreal|Winnipeg|Indiana|Kentucky)|^US\//.test(fuso)) return 'America/New_York';
-    return 'America/Sao_Paulo';
-}
-
-function fusoAtual() {
-    try {
-        const salvo = localStorage.getItem('fuso');
-        if (FUSOS.some(f => f.id === salvo)) return salvo;
-    } catch { /* sem armazenamento */ }
-    return fusoDoNavegador();
-}
-
-function escolherFuso(id) {
-    try { localStorage.setItem('fuso', id); } catch { /* sem armazenamento */ }
-}
-
-const nomeDoFuso = id => esc(FUSOS.find(f => f.id === id)?.[idiomaAtual()] ?? id);
-
-const opcoesDeFuso = selecionado => FUSOS.map(f =>
-    `<option value="${f.id}" ${f.id === selecionado ? 'selected' : ''}>${nomeDoFuso(f.id)}</option>`).join('');
 
 // Data/hora "de parede" de um instante num fuso: { ano, mes, dia, hora, minuto, diaDaSemana }
 function partesNoFuso(ms, fuso) {
@@ -315,15 +281,34 @@ function converterPeriodos(periodos, origem, destino) {
     return convertidos;
 }
 
-// Períodos (manhã, tarde...) da vtuber no fuso escolhido pelo visitante:
-// - com agenda: calculados a partir dos horários das lives;
-// - sem agenda: os marcados no painel (no fuso da vtuber, padrão Brasília), convertidos para o fuso escolhido.
-// "Diverso" é sempre o marcado no painel.
+// Períodos marcados à mão, por fuso: o "horario" vale para o fuso da vtuber; "horarioFusos" guarda os outros.
+function periodosManuais(vt) {
+    const manuais = {};
+    for (const [fuso, periodos] of Object.entries(vt.horarioFusos ?? {})) {
+        if (periodos?.length) manuais[fuso] = periodos;
+    }
+    const base = (vt.horario ?? []).filter(p => p !== 'diverso');
+    if (base.length) manuais[vt.fuso || FUSOS[0].id] = base;
+    return manuais;
+}
+
+// Períodos (manhã, tarde...) da vtuber num fuso:
+// 1. com agenda: calculados a partir dos horários das lives;
+// 2. se foram marcados à mão para esse fuso: esses;
+// 3. senão: convertidos automaticamente de um fuso marcado à mão (de preferência o da própria vtuber).
+// "Diverso" é sempre o marcado no painel e vale para todos os fusos.
 function periodosDaVtuber(vt, destino = fusoAtual()) {
-    const periodos = vt.agenda?.length
-        ? new Set(agendaNoFuso(vt, destino).map(g => periodoDaHora(g.inicio)))
-        : converterPeriodos(vt.horario, vt.fuso || FUSOS[0].id, destino);
-    if (vt.horario.includes('diverso')) periodos.add('diverso');
+    let periodos;
+    if (vt.agenda?.length) {
+        periodos = new Set(agendaNoFuso(vt, destino).map(g => periodoDaHora(g.inicio)));
+    } else {
+        const manuais = periodosManuais(vt);
+        const origem = [vt.fuso, ...FUSOS.map(f => f.id)].find(fuso => manuais[fuso]);
+        periodos = manuais[destino]
+            ? new Set(manuais[destino])
+            : origem ? converterPeriodos(manuais[origem], origem, destino) : new Set();
+    }
+    if (vt.horario?.includes('diverso')) periodos.add('diverso');
     return PERIODOS.filter(p => periodos.has(p));
 }
 

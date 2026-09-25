@@ -259,7 +259,8 @@ function formularioNovaOpcao(grupo) {
 
 function montarCategorias() {
     const marcados = new Set([...editor.querySelectorAll('#categorias input:checked')].map(i => `${i.name}:${i.value}`));
-    $('categorias').innerHTML = Object.keys(FILTROS).map(grupo => `
+    // O horário tem seção própria ("Horários"), com um período por fuso.
+    $('categorias').innerHTML = Object.keys(FILTROS).filter(grupo => grupo !== 'horario').map(grupo => `
         <fieldset class="filter-group">
             <legend>${tituloDoGrupo(grupo)}</legend>
             <div class="filter-options">
@@ -416,6 +417,13 @@ function preencherResumo(vt) {
     mostrarImagem('card', vt?.img, vt?.imgMini);
     mostrarImagem('perfil', vt?.imgPerfil && vt.imgPerfil !== vt.img ? vt.imgPerfil : null);
 
+    periodosManuaisForm = Object.fromEntries(Object.entries(vt ? periodosManuais(vt) : {}).map(([fuso, p]) => [fuso, new Set(p)]));
+    $('diverso').checked = Boolean(vt?.horario?.includes('diverso'));
+    editor.elements.fuso.value = vt?.fuso ?? FUSOS[0].id;
+    agendaEl.innerHTML = '';
+    (vt?.agenda ?? []).forEach(adicionarHorario);
+    montarPeriodosFusos();
+
     $('editor-modo').textContent = vt ? 'Editando' : 'Cadastro';
     $('editor-titulo').textContent = vt ? vt.nome : 'Nova Vtuber';
     $('excluir').hidden = !vt;
@@ -426,9 +434,6 @@ function preencherResumo(vt) {
 // Preenche bio, redes e vídeos (vêm do pedido de detalhes).
 function preencherDetalhes(vt) {
     const campos = editor.elements;
-    campos.fuso.value = vt?.fuso ?? FUSOS[0].id;
-    agendaEl.innerHTML = '';
-    (vt?.agenda ?? []).forEach(adicionarHorario);
     campos.bio.value = vt?.bio ?? '';
     campos.bioEn.value = vt?.bioEn ?? '';
     atualizarStatusIngles();
@@ -616,6 +621,79 @@ editor.querySelectorAll('.image-field input[type="file"]').forEach(input => {
     });
 });
 
+// ---------- Período das lives em cada fuso ----------
+// Linhas "manuais" são as marcadas à mão; as outras mostram a conversão automática (periodosDaVtuber).
+const PERIODOS_DO_DIA = ['madrugada', 'manha', 'tarde', 'noite'];
+let periodosManuaisForm = {}; // { fuso: Set(periodos) }
+
+// A vtuber como está no formulário, para calcular os períodos automáticos
+function vtuberDoFormulario() {
+    return {
+        fuso: editor.elements.fuso.value,
+        agenda: coletarAgenda().filter(h => h.dias.length && h.inicio),
+        ...horariosDoFormulario()
+    };
+}
+
+function horariosDoFormulario() {
+    const fuso = editor.elements.fuso.value;
+    const ordenar = conjunto => PERIODOS_DO_DIA.filter(p => conjunto?.has(p));
+    return {
+        horario: [...ordenar(periodosManuaisForm[fuso]), ...($('diverso').checked ? ['diverso'] : [])],
+        horarioFusos: Object.fromEntries(Object.entries(periodosManuaisForm)
+            .filter(([outro, periodos]) => outro !== fuso && periodos.size)
+            .map(([outro, periodos]) => [outro, ordenar(periodos)]))
+    };
+}
+
+function montarPeriodosFusos() {
+    const vt = vtuberDoFormulario();
+    const pelaAgenda = vt.agenda.length > 0;
+    $('periodos-fusos').innerHTML = FUSOS.map(({ id }) => {
+        const manual = !pelaAgenda && Boolean(periodosManuaisForm[id]?.size);
+        const ativos = manual ? periodosManuaisForm[id] : new Set(periodosDaVtuber(vt, id));
+        const estado = pelaAgenda ? 'pela agenda' : manual ? 'manual' : ativos.size ? 'automático' : 'vazio';
+        return `
+            <div class="periodo-fuso ${manual ? 'manual' : 'auto'}" data-fuso="${id}">
+                <div class="periodo-fuso-nome">
+                    <strong>${nomeDoFuso(id)}</strong>
+                    ${id === vt.fuso ? '<span class="tag-mini">fuso da vtuber</span>' : ''}
+                </div>
+                <div class="periodo-fuso-chips">
+                    ${PERIODOS_DO_DIA.map(p => `
+                        <button type="button" class="chip-periodo" data-periodo="${p}" aria-pressed="${ativos.has(p)}" ${pelaAgenda ? 'disabled' : ''}>${rotulo('horario', p)}</button>`).join('')}
+                </div>
+                <span class="periodo-fuso-estado" data-estado="${estado}">${estado}</span>
+                ${manual && id !== vt.fuso ? '<button type="button" class="link-btn" data-acao="automatico">Voltar ao automático</button>' : ''}
+            </div>`;
+    }).join('');
+}
+
+$('periodos-fusos').addEventListener('click', event => {
+    const linha = event.target.closest('.periodo-fuso');
+    if (!linha) return;
+    const fuso = linha.dataset.fuso;
+    if (event.target.closest('[data-acao="automatico"]')) {
+        delete periodosManuaisForm[fuso];
+    } else {
+        const chip = event.target.closest('.chip-periodo');
+        if (!chip || chip.disabled) return;
+        // Uma linha automática vira manual começando pelos períodos que já mostrava.
+        if (!periodosManuaisForm[fuso]?.size) {
+            periodosManuaisForm[fuso] = new Set(periodosDaVtuber(vtuberDoFormulario(), fuso).filter(p => p !== 'diverso'));
+        }
+        const periodos = periodosManuaisForm[fuso];
+        if (periodos.has(chip.dataset.periodo)) periodos.delete(chip.dataset.periodo);
+        else periodos.add(chip.dataset.periodo);
+        if (!periodos.size) delete periodosManuaisForm[fuso];
+    }
+    alterado = true;
+    montarPeriodosFusos();
+});
+
+$('diverso').addEventListener('change', montarPeriodosFusos);
+$('fuso-vtuber').addEventListener('change', montarPeriodosFusos);
+
 // ---------- Agenda de lives ----------
 const agendaEl = $('agenda');
 const DIAS_CURTOS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
@@ -656,7 +734,10 @@ agendaEl.addEventListener('click', event => {
     if (!botao) return;
     botao.closest('.agenda-row').remove();
     alterado = true;
+    montarPeriodosFusos();
 });
+
+agendaEl.addEventListener('change', montarPeriodosFusos);
 
 $('add-horario').addEventListener('click', () => {
     adicionarHorario().querySelector('.dias input').focus();
@@ -724,7 +805,7 @@ function coletar() {
         bio: campos.bio.value,
         bioEn: campos.bioEn.value,
         tags: marcados('tags'),
-        horario: marcados('horario'),
+        ...horariosDoFormulario(),
         plataforma: marcados('plataforma'),
         idioma: marcados('idioma'),
         redes: {

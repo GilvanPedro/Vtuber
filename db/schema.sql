@@ -37,6 +37,10 @@ ALTER TABLE vtubers ADD COLUMN IF NOT EXISTS bio_en TEXT NOT NULL DEFAULT '';
 ALTER TABLE vtubers ADD COLUMN IF NOT EXISTS agenda JSONB NOT NULL DEFAULT '[]';
 ALTER TABLE vtubers ADD COLUMN IF NOT EXISTS fuso TEXT NOT NULL DEFAULT 'America/Sao_Paulo';
 
+-- Períodos (manha/tarde/noite/madrugada) definidos à mão para outros fusos: { 'Europe/Paris': ['noite'], ... }
+-- A coluna horario vale para o fuso da própria vtuber; fusos sem entrada aqui são convertidos automaticamente.
+ALTER TABLE vtubers ADD COLUMN IF NOT EXISTS horario_fusos JSONB NOT NULL DEFAULT '{}';
+
 -- Opções cadastráveis pelo painel, separadas por grupo:
 --   'tags' (conteúdo), 'plataforma' e 'idioma'. O id é gerado a partir do nome em português.
 CREATE TABLE IF NOT EXISTS tags (

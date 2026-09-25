@@ -235,16 +235,6 @@ window.addEventListener('resize', () => {
     });
 });
 
-// Fuso horário do visitante (muda o período das vtubers que têm agenda)
-const fusoEl = document.getElementById('fuso');
-fusoEl.innerHTML = opcoesDeFuso(fusoAtual());
-fusoEl.addEventListener('change', () => {
-    escolherFuso(fusoEl.value);
-    estado.pagina = 1;
-    salvarUrl(false);
-    render();
-});
-
 lerUrl();
 colunasAtuais = colunasDoGrid();
 grid.replaceChildren(...cardsCarregando(colunasAtuais * 2));
