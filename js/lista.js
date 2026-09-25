@@ -104,6 +104,11 @@ function porPagina() {
     return colunasDoGrid() * LINHAS_POR_PAGINA;
 }
 
+// Usado pelo botão "Estou com sorte" (script.js): sorteia entre as Vtubers que a busca/filtros mostram.
+function vtubersParaSorteio() {
+    return carregado ? filtrar() : null;
+}
+
 // ---------- Renderização ----------
 function render() {
     if (!carregado) return;

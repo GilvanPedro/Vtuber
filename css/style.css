@@ -1733,6 +1733,25 @@ fieldset.filter-group {
         flex: 1;
     }
 
+    /* Catálogo no celular: ordenação numa linha; "Estou com sorte" e "Filtros" lado a lado embaixo */
+    .finder-top .select {
+        flex: 1 1 100%;
+    }
+
+    .finder-top .btn-sorte,
+    .finder-top .filters-toggle {
+        padding-inline: 14px;
+        white-space: nowrap;
+    }
+
+    .finder-top .btn-sorte {
+        flex: 1 1 auto;
+    }
+
+    .finder-top .filters-toggle {
+        flex: 0 0 auto;
+    }
+
     .panel {
         padding: 22px;
     }

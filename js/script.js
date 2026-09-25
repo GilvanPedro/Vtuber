@@ -82,7 +82,10 @@ if (botaoSorte) {
         if (tela) document.body.appendChild(tela);
         try {
             // A lista carrega enquanto o dado cai (normalmente já está em memória)
-            const [lista] = await Promise.all([carregarVtubers(), esperar(tela ? QUEDA_DO_DADO_MS : 0)]);
+            // No catálogo, sorteia só entre as Vtubers da busca/filtros atuais (lista.js); na home, entre todas.
+            const [todas] = await Promise.all([carregarVtubers(), esperar(tela ? QUEDA_DO_DADO_MS : 0)]);
+            const filtradas = typeof vtubersParaSorteio === 'function' ? vtubersParaSorteio() : null;
+            const lista = filtradas?.length ? filtradas : todas;
             const sorteada = sortearVtuber(lista);
             if (!sorteada) throw new Error('lista vazia');
             if (tela) {
