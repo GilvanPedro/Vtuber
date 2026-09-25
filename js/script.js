@@ -46,17 +46,6 @@ async function carregarPerfil(id) {
     document.title = t('perfil.title', { nome: vt.nome });
     document.documentElement.style.setProperty('--accent', vt.cor);
 
-    const fatos = [
-        ['tags', 'bx-purchase-tag'],
-        ['horario', 'bx-time-five'],
-        ['plataforma', 'bx-broadcast'],
-        ['idioma', 'bx-globe']
-    ].filter(([grupo]) => vt[grupo].length).map(([grupo, icone]) => `
-        <div class="fact">
-            <span class="fact-label"><i class='bx ${icone}'></i>${tituloDoGrupo(grupo)}</span>
-            ${vt[grupo].map(v => `<span class="chip">${rotulo(grupo, v)}</span>`).join('')}
-        </div>`).join('');
-
     const redesFixas = [
         ['twitch', 'social-twitch', 'bxl-twitch', 'Twitch'],
         ['youtube', 'social-youtube', 'bxl-youtube', 'YouTube'],
@@ -93,7 +82,8 @@ async function carregarPerfil(id) {
                 <div>
                     <a class="back-link" href="./vtubers.html"><i class='bx bx-chevron-left'></i>${t('perfil.voltar')}</a>
                     <h1 class="profile-name">${esc(vt.nome)}</h1>
-                    <div class="profile-facts">${fatos}</div>
+                    <div class="profile-facts" id="perfil-fatos">${htmlDosFatos(vt)}</div>
+                    <div id="perfil-agenda">${htmlDaAgenda(vt)}</div>
                     <div class="socials">${redes}</div>
                 </div>
             </div>
@@ -113,6 +103,52 @@ async function carregarPerfil(id) {
                 </div>` : ''}
             </div>
         </section>`;
+
+    // Trocar o fuso só redesenha horários e agenda (os vídeos não recarregam).
+    perfil.addEventListener('change', event => {
+        if (event.target.id !== 'fuso-perfil') return;
+        escolherFuso(event.target.value);
+        document.getElementById('perfil-fatos').innerHTML = htmlDosFatos(vt);
+        document.getElementById('perfil-agenda').innerHTML = htmlDaAgenda(vt);
+        document.getElementById('fuso-perfil').focus();
+    });
+}
+
+// Conteúdo, horário (no fuso escolhido), plataforma e idioma
+function htmlDosFatos(vt) {
+    return [
+        ['tags', 'bx-purchase-tag', vt.tags],
+        ['horario', 'bx-time-five', periodosDaVtuber(vt)],
+        ['plataforma', 'bx-broadcast', vt.plataforma],
+        ['idioma', 'bx-globe', vt.idioma]
+    ].filter(([, , valores]) => valores.length).map(([grupo, icone, valores]) => `
+        <div class="fact">
+            <span class="fact-label"><i class='bx ${icone}'></i>${tituloDoGrupo(grupo)}</span>
+            ${valores.map(v => `<span class="chip">${rotulo(grupo, v)}</span>`).join('')}
+        </div>`).join('');
+}
+
+// Dias e horários das lives convertidos para o fuso escolhido pelo visitante
+function htmlDaAgenda(vt) {
+    if (!vt.agenda?.length) return '';
+    const fuso = fusoAtual();
+    const linhas = agendaNoFuso(vt, fuso).map(item => `
+        <li>
+            <span class="schedule-days">${item.dias.map(nomeDoDia).join(', ')}</span>
+            <span class="schedule-time">${formatarHora(item.inicio)}${item.fim ? ` – ${formatarHora(item.fim)}` : ''}</span>
+        </li>`).join('');
+    return `
+        <div class="schedule">
+            <div class="schedule-head">
+                <span class="fact-label"><i class='bx bx-calendar'></i>${t('perfil.agenda')}</span>
+                <label class="tz-select">
+                    <i class='bx bx-world'></i>
+                    <span class="sr-only">${t('fuso.label')}</span>
+                    <select id="fuso-perfil" class="select">${opcoesDeFuso(fuso)}</select>
+                </label>
+            </div>
+            <ul class="schedule-list">${linhas}</ul>
+        </div>`;
 }
 
 // Player de cada momento do criador. A Twitch exige o domínio do site no parâmetro "parent".

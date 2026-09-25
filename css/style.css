@@ -1082,6 +1082,73 @@ fieldset.filter-group {
     border: 0;
 }
 
+/* Seletor de fuso horário (lista e perfil) */
+.tz-select {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.tz-select > i {
+    position: absolute;
+    left: 14px;
+    font-size: 1.15rem;
+    color: var(--text-dim);
+    pointer-events: none;
+}
+
+.tz-select .select {
+    padding-left: 40px;
+}
+
+/* Agenda de lives no perfil */
+.schedule {
+    margin-bottom: 26px;
+    padding: 16px 18px;
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--surface) 80%, transparent);
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.schedule-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.schedule-head .select {
+    height: 40px;
+    font-size: 0.9rem;
+}
+
+.schedule-list {
+    list-style: none;
+    display: grid;
+    gap: 6px;
+}
+
+.schedule-list li {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 8px 0;
+    border-top: 1px solid var(--border);
+}
+
+.schedule-days {
+    font-weight: 800;
+}
+
+.schedule-time {
+    color: var(--accent);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+}
+
 /* =========================================================
    About
    ========================================================= */
@@ -1882,6 +1949,89 @@ code {
 .tab-status.ok {
     background: rgba(62, 207, 142, 0.18);
     color: #3ecf8e;
+}
+
+.agenda-fuso {
+    max-width: 420px;
+}
+
+.agenda-fuso .select {
+    width: 100%;
+}
+
+.agenda-rows {
+    list-style: none;
+    display: grid;
+    gap: 10px;
+}
+
+.agenda-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+}
+
+.dias {
+    display: flex;
+    gap: 4px;
+}
+
+.dia {
+    position: relative;
+}
+
+.dia input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.dia span {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--border-strong);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-weight: 800;
+    cursor: pointer;
+    user-select: none;
+}
+
+.dia input:checked + span {
+    background: color-mix(in srgb, var(--primary) 28%, transparent);
+    border-color: var(--primary);
+    color: var(--text);
+}
+
+.dia input:focus-visible + span {
+    outline: 2px solid var(--secondary);
+    outline-offset: 2px;
+}
+
+.hora input {
+    height: 38px;
+    padding: 0 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color-scheme: dark;
+}
+
+.ate {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+}
+
+.agenda-row .icon-btn {
+    margin-left: auto;
 }
 
 .video-rows {

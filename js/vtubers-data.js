@@ -175,3 +175,133 @@ function cardsCarregando(quantidade) {
         return card;
     });
 }
+
+// ---------- Fusos horários e agenda de lives ----------
+// Os ids precisam bater com FUSOS em lib/validar.js.
+const FUSOS = [
+    { id: 'America/Sao_Paulo', pt: 'Brasil (Brasília)', en: 'Brazil (Brasília)' },
+    { id: 'America/New_York', pt: 'EUA (Leste)', en: 'USA (Eastern)' },
+    { id: 'America/Los_Angeles', pt: 'EUA (Pacífico)', en: 'USA (Pacific)' },
+    { id: 'Europe/Paris', pt: 'Europa (Central)', en: 'Europe (Central)' }
+];
+const PERIODOS = ['manha', 'tarde', 'noite', 'madrugada', 'diverso'];
+
+// Palpite inicial a partir do fuso do navegador (o mais próximo da lista).
+function fusoDoNavegador() {
+    let fuso = '';
+    try { fuso = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch { /* navegador antigo */ }
+    if (FUSOS.some(f => f.id === fuso)) return fuso;
+    if (fuso.startsWith('Europe/')) return 'Europe/Paris';
+    if (/^America\/(Los_Angeles|Vancouver|Tijuana|Phoenix|Denver|Boise|Edmonton)|^US\/(Pacific|Mountain|Arizona)/.test(fuso)) return 'America/Los_Angeles';
+    if (/^America\/(New_York|Chicago|Detroit|Toronto|Montreal|Winnipeg|Indiana|Kentucky)|^US\//.test(fuso)) return 'America/New_York';
+    return 'America/Sao_Paulo';
+}
+
+function fusoAtual() {
+    try {
+        const salvo = localStorage.getItem('fuso');
+        if (FUSOS.some(f => f.id === salvo)) return salvo;
+    } catch { /* sem armazenamento */ }
+    return fusoDoNavegador();
+}
+
+function escolherFuso(id) {
+    try { localStorage.setItem('fuso', id); } catch { /* sem armazenamento */ }
+}
+
+const nomeDoFuso = id => esc(FUSOS.find(f => f.id === id)?.[idiomaAtual()] ?? id);
+
+const opcoesDeFuso = selecionado => FUSOS.map(f =>
+    `<option value="${f.id}" ${f.id === selecionado ? 'selected' : ''}>${nomeDoFuso(f.id)}</option>`).join('');
+
+// Data/hora "de parede" de um instante num fuso: { ano, mes, dia, hora, minuto, diaDaSemana }
+function partesNoFuso(ms, fuso) {
+    const partes = Object.fromEntries(new Intl.DateTimeFormat('en-US', {
+        timeZone: fuso, hourCycle: 'h23', weekday: 'short',
+        year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'
+    }).formatToParts(ms).map(p => [p.type, p.value]));
+    return {
+        ano: +partes.year, mes: +partes.month - 1, dia: +partes.day,
+        hora: +partes.hour % 24, minuto: +partes.minute,
+        diaDaSemana: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(partes.weekday)
+    };
+}
+
+// Converte uma data/hora local de um fuso para um instante (considera horário de verão).
+function instanteNoFuso(ano, mes, dia, hora, minuto, fuso) {
+    const comoUtc = Date.UTC(ano, mes, dia, hora, minuto);
+    const diferenca = ms => {
+        const p = partesNoFuso(ms, fuso);
+        return Date.UTC(p.ano, p.mes, p.dia, p.hora, p.minuto) - Math.floor(ms / 60000) * 60000;
+    };
+    const aproximado = comoUtc - diferenca(comoUtc);
+    return comoUtc - diferenca(aproximado);
+}
+
+// Próxima ocorrência (a partir desta semana) de um dia da semana + hora num fuso.
+function proximaLive(diaDaSemana, horario, fuso) {
+    const [hora, minuto] = horario.split(':').map(Number);
+    const hoje = partesNoFuso(Date.now(), fuso);
+    const avanco = (diaDaSemana - hoje.diaDaSemana + 7) % 7;
+    return instanteNoFuso(hoje.ano, hoje.mes, hoje.dia + avanco, hora, minuto, fuso);
+}
+
+const doisDigitos = n => String(n).padStart(2, '0');
+const minutosDe = horario => Number(horario.slice(0, 2)) * 60 + Number(horario.slice(3, 5));
+
+// Agenda da vtuber convertida para outro fuso, agrupando dias com o mesmo horário:
+// [{ dias: [1, 3, 5], inicio: '20:00', fim: '23:00' | null }] (a live pode mudar de dia na conversão)
+function agendaNoFuso(vt, destino = fusoAtual()) {
+    const origem = vt.fuso || FUSOS[0].id;
+    const grupos = new Map();
+    for (const item of vt.agenda ?? []) {
+        for (const dia of item.dias) {
+            const inicio = proximaLive(dia, item.inicio, origem);
+            const local = partesNoFuso(inicio, destino);
+            let fim = null;
+            if (item.fim) {
+                let duracao = minutosDe(item.fim) - minutosDe(item.inicio);
+                if (duracao <= 0) duracao += 24 * 60; // termina depois da meia-noite
+                const final = partesNoFuso(inicio + duracao * 60000, destino);
+                fim = `${doisDigitos(final.hora)}:${doisDigitos(final.minuto)}`;
+            }
+            const horaInicio = `${doisDigitos(local.hora)}:${doisDigitos(local.minuto)}`;
+            const chave = `${horaInicio}|${fim ?? ''}`;
+            if (!grupos.has(chave)) grupos.set(chave, { dias: new Set(), inicio: horaInicio, fim });
+            grupos.get(chave).dias.add(local.diaDaSemana);
+        }
+    }
+    const segundaPrimeiro = dia => (dia + 6) % 7;
+    return [...grupos.values()]
+        .map(g => ({ ...g, dias: [...g.dias].sort((a, b) => segundaPrimeiro(a) - segundaPrimeiro(b)) }))
+        .sort((a, b) => segundaPrimeiro(a.dias[0]) - segundaPrimeiro(b.dias[0]) || a.inicio.localeCompare(b.inicio));
+}
+
+const periodoDaHora = horario => {
+    const hora = Number(horario.slice(0, 2));
+    return hora < 6 ? 'madrugada' : hora < 12 ? 'manha' : hora < 18 ? 'tarde' : 'noite';
+};
+
+// Períodos (manhã, tarde...) da vtuber no fuso escolhido. Com agenda, são calculados a partir dela;
+// sem agenda, valem os marcados no painel. "Diverso" é sempre o marcado no painel.
+function periodosDaVtuber(vt, destino = fusoAtual()) {
+    if (!vt.agenda?.length) return vt.horario;
+    const periodos = new Set(agendaNoFuso(vt, destino).map(g => periodoDaHora(g.inicio)));
+    if (vt.horario.includes('diverso')) periodos.add('diverso');
+    return PERIODOS.filter(p => periodos.has(p));
+}
+
+// Textos da agenda no idioma atual: "Seg, Qua, Sex" e "20:00 – 23:00" (ou "8:00 PM – 11:00 PM" em inglês)
+function nomeDoDia(dia) {
+    const nome = new Intl.DateTimeFormat(document.documentElement.lang || 'pt-BR', { weekday: 'short', timeZone: 'UTC' })
+        .format(Date.UTC(2024, 0, 7 + dia)) // 7/jan/2024 foi um domingo
+        .replace('.', '');
+    return nome.charAt(0).toUpperCase() + nome.slice(1);
+}
+
+function formatarHora(horario) {
+    const idioma = document.documentElement.lang || 'pt-BR';
+    // Português: 00:00–23:59; inglês: 12h (8:00 PM)
+    return new Intl.DateTimeFormat(idioma, { hour: idioma.startsWith('pt') ? '2-digit' : 'numeric', minute: '2-digit', timeZone: 'UTC' })
+        .format(Date.UTC(2024, 0, 1, Number(horario.slice(0, 2)), Number(horario.slice(3, 5))));
+}

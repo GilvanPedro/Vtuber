@@ -32,6 +32,11 @@ ALTER TABLE imagens ADD CONSTRAINT imagens_tipo_check CHECK (tipo IN ('card', 'm
 -- Bio em inglês (adicionada depois; não altera dados existentes)
 ALTER TABLE vtubers ADD COLUMN IF NOT EXISTS bio_en TEXT NOT NULL DEFAULT '';
 
+-- Agenda de lives: [{ dias: [0-6, 0 = domingo], inicio: 'HH:MM', fim: 'HH:MM' | null }]
+-- com os horários no fuso da própria vtuber (coluna fuso); o site converte para o fuso de quem visita.
+ALTER TABLE vtubers ADD COLUMN IF NOT EXISTS agenda JSONB NOT NULL DEFAULT '[]';
+ALTER TABLE vtubers ADD COLUMN IF NOT EXISTS fuso TEXT NOT NULL DEFAULT 'America/Sao_Paulo';
+
 -- Opções cadastráveis pelo painel, separadas por grupo:
 --   'tags' (conteúdo), 'plataforma' e 'idioma'. O id é gerado a partir do nome em português.
 CREATE TABLE IF NOT EXISTS tags (

@@ -122,6 +122,17 @@
                     </fieldset>
 
                     <fieldset class="editor-section">
+                        <legend>Agenda de lives</legend>
+                        <label class="field agenda-fuso">
+                            <span>Fuso horário da vtuber (os horários abaixo estão neste fuso)</span>
+                            <select name="fuso" class="select" id="fuso-vtuber"></select>
+                        </label>
+                        <ul class="agenda-rows" id="agenda"></ul>
+                        <button type="button" class="btn btn-ghost btn-sm" id="add-horario"><i class='bx bx-plus'></i>Adicionar horário</button>
+                        <small class="hint">O site converte estes horários para o fuso escolhido por quem visita (Brasil, EUA ou Europa). Com a agenda preenchida, o período (manhã, tarde...) do filtro é calculado sozinho; sem agenda, vale o horário marcado em Categorias.</small>
+                    </fieldset>
+
+                    <fieldset class="editor-section">
                         <legend>Bio</legend>
                         <div class="tabs" role="tablist" aria-label="Idioma da bio">
                             <button type="button" role="tab" id="aba-bio-pt" aria-controls="painel-bio-pt" aria-selected="true">🇧🇷 Português</button>

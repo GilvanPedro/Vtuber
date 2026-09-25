@@ -81,9 +81,13 @@ function filtrar() {
     // Dentro de um mesmo grupo basta bater uma opção (OU); entre grupos todas precisam bater (E).
     const lista = VTUBERS.filter(vt =>
         (!termo || normalizar(vt.nome).includes(termo) || normalizar(vt.id).includes(termo)) &&
-        GRUPOS.every(g => estado.filtros[g].size === 0 || vt[g].some(v => estado.filtros[g].has(v)) ||
+        GRUPOS.every(g => {
+            if (estado.filtros[g].size === 0) return true;
+            // Horário: calculado a partir da agenda no fuso escolhido (quando a vtuber tem agenda).
+            const valores = g === 'horario' ? periodosDaVtuber(vt) : vt[g];
             // Quem tem horário "diverso" aparece em qualquer filtro de horário.
-            (g === 'horario' && vt.horario.includes('diverso')))
+            return valores.some(v => estado.filtros[g].has(v)) || (g === 'horario' && valores.includes('diverso'));
+        })
     );
     if (estado.ordem === 'az') {
         lista.sort((a, b) => a.nome.localeCompare(b.nome, document.documentElement.lang));
@@ -229,6 +233,16 @@ window.addEventListener('resize', () => {
         salvarUrl(false);
         render();
     });
+});
+
+// Fuso horário do visitante (muda o período das vtubers que têm agenda)
+const fusoEl = document.getElementById('fuso');
+fusoEl.innerHTML = opcoesDeFuso(fusoAtual());
+fusoEl.addEventListener('change', () => {
+    escolherFuso(fusoEl.value);
+    estado.pagina = 1;
+    salvarUrl(false);
+    render();
 });
 
 lerUrl();

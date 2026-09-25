@@ -426,6 +426,9 @@ function preencherResumo(vt) {
 // Preenche bio, redes e vídeos (vêm do pedido de detalhes).
 function preencherDetalhes(vt) {
     const campos = editor.elements;
+    campos.fuso.value = vt?.fuso ?? FUSOS[0].id;
+    agendaEl.innerHTML = '';
+    (vt?.agenda ?? []).forEach(adicionarHorario);
     campos.bio.value = vt?.bio ?? '';
     campos.bioEn.value = vt?.bioEn ?? '';
     atualizarStatusIngles();
@@ -613,6 +616,52 @@ editor.querySelectorAll('.image-field input[type="file"]').forEach(input => {
     });
 });
 
+// ---------- Agenda de lives ----------
+const agendaEl = $('agenda');
+const DIAS_CURTOS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+const DIAS_NOMES = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+const ORDEM_DOS_DIAS = [1, 2, 3, 4, 5, 6, 0]; // mostra de segunda a domingo
+
+$('fuso-vtuber').innerHTML = opcoesDeFuso(FUSOS[0].id);
+
+function adicionarHorario(horario = { dias: [], inicio: '', fim: null }) {
+    const li = document.createElement('li');
+    li.className = 'agenda-row';
+    li.innerHTML = `
+        <div class="dias" role="group" aria-label="Dias da semana">
+            ${ORDEM_DOS_DIAS.map(dia => `
+                <label class="dia" title="${DIAS_NOMES[dia]}">
+                    <input type="checkbox" value="${dia}" ${horario.dias.includes(dia) ? 'checked' : ''}>
+                    <span>${DIAS_CURTOS[dia]}</span>
+                </label>`).join('')}
+        </div>
+        <label class="hora"><span class="sr-only">Início</span><input type="time" class="inicio" value="${horario.inicio}" required></label>
+        <span class="ate">até</span>
+        <label class="hora"><span class="sr-only">Término (opcional)</span><input type="time" class="fim" value="${horario.fim ?? ''}"></label>
+        <button type="button" class="icon-btn danger" title="Remover horário"><i class='bx bx-x'></i></button>`;
+    agendaEl.appendChild(li);
+    return li;
+}
+
+function coletarAgenda() {
+    return [...agendaEl.querySelectorAll('.agenda-row')].map(li => ({
+        dias: [...li.querySelectorAll('.dias input:checked')].map(input => Number(input.value)),
+        inicio: li.querySelector('.inicio').value,
+        fim: li.querySelector('.fim').value || null
+    }));
+}
+
+agendaEl.addEventListener('click', event => {
+    const botao = event.target.closest('.icon-btn.danger');
+    if (!botao) return;
+    botao.closest('.agenda-row').remove();
+    alterado = true;
+});
+
+$('add-horario').addEventListener('click', () => {
+    adicionarHorario().querySelector('.dias input').focus();
+});
+
 // ---------- Momentos do criador (YouTube e Twitch) ----------
 function adicionarVideo(url = '') {
     const li = document.createElement('li');
@@ -683,6 +732,8 @@ function coletar() {
             ...linksDasRedesExtras()
         },
         videos,
+        fuso: campos.fuso.value,
+        agenda: coletarAgenda(),
         imagens: imagensNovas
     };
 }
@@ -692,6 +743,10 @@ function validarNoCliente(dados) {
     if (!/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(dados.id)) return 'Identificador inválido: use só minúsculas, números e hífens.';
     if (!atual && !dados.imagens.card) return 'Escolha a imagem do card.';
     if (dados.videos.some(v => !identificarVideo(v.url))) return 'Há um link em "Momentos do criador" que não foi reconhecido (marcado em vermelho).';
+    const semDia = dados.agenda.findIndex(h => !h.dias.length);
+    if (semDia >= 0) return `Agenda: escolha pelo menos um dia no horário ${semDia + 1}.`;
+    const semHora = dados.agenda.findIndex(h => !h.inicio);
+    if (semHora >= 0) return `Agenda: informe a hora de início no horário ${semHora + 1}.`;
     return null;
 }
 
