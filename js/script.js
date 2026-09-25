@@ -24,25 +24,82 @@ if (recentes) {
         });
 }
 
-// Home: "Estou com sorte" abre o perfil de uma Vtuber aleatória (sem repetir a última sorteada)
+// Home: "Estou com sorte" — um dado cai na tela, quica, brilha e abre o perfil de uma Vtuber aleatória
+// (sem repetir a última sorteada).
 const botaoSorte = document.getElementById('sorte');
+const QUEDA_DO_DADO_MS = 1150;  // queda + quique (igual à animação em style.css)
+const BRILHO_DO_DADO_MS = 750;  // brilho + nome antes de abrir o perfil
+
+// Pontinhos de cada face numa grade 3x3 (posições de 1 a 9)
+const PONTOS_DAS_FACES = { 1: [5], 2: [1, 9], 3: [1, 5, 9], 4: [1, 3, 7, 9], 5: [1, 3, 5, 7, 9], 6: [1, 3, 4, 6, 7, 9] };
+// A face da frente (a que fica virada para a tela ao parar) é o 6
+const FACES_DO_DADO = { frente: 6, tras: 1, direita: 3, esquerda: 4, cima: 5, baixo: 2 };
+
+function criarTelaDoDado() {
+    const faces = Object.entries(FACES_DO_DADO).map(([lado, valor]) => `
+        <div class="dado-face dado-${lado}">
+            ${PONTOS_DAS_FACES[valor].map(pos => `<span class="dado-ponto" style="grid-area:${Math.ceil(pos / 3)} / ${(pos - 1) % 3 + 1}"></span>`).join('')}
+        </div>`).join('');
+    const tela = document.createElement('div');
+    tela.className = 'sorte-overlay';
+    tela.setAttribute('role', 'status');
+    tela.setAttribute('aria-live', 'polite');
+    tela.innerHTML = `
+        <div class="sorte-palco">
+            <div class="dado-area">
+                <div class="dado-brilho"></div>
+                <div class="dado-queda"><div class="dado">${faces}</div></div>
+                <div class="dado-sombra"></div>
+            </div>
+            <p class="sorte-legenda">${t('home.sorteando')}</p>
+        </div>`;
+    return tela;
+}
+
+const esperar = ms => new Promise(resolver => setTimeout(resolver, ms));
+
+function sortearVtuber(lista) {
+    let ultima = null;
+    try { ultima = sessionStorage.getItem('ultimaSorteada'); } catch { /* sem armazenamento */ }
+    const opcoes = lista.length > 1 ? lista.filter(vt => vt.id !== ultima) : lista;
+    const sorteada = opcoes[Math.floor(Math.random() * opcoes.length)];
+    if (sorteada) {
+        try { sessionStorage.setItem('ultimaSorteada', sorteada.id); } catch { /* sem armazenamento */ }
+    }
+    return sorteada;
+}
+
+function restaurarBotaoSorte() {
+    document.querySelector('.sorte-overlay')?.remove();
+    botaoSorte.disabled = false;
+}
+
 if (botaoSorte) {
     botaoSorte.addEventListener('click', async () => {
         botaoSorte.disabled = true;
-        botaoSorte.classList.add('rolando');
+        const semAnimacao = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const tela = semAnimacao ? null : criarTelaDoDado();
+        if (tela) document.body.appendChild(tela);
         try {
-            const lista = await carregarVtubers();
-            let ultima = null;
-            try { ultima = sessionStorage.getItem('ultimaSorteada'); } catch { /* sem armazenamento */ }
-            const opcoes = lista.length > 1 ? lista.filter(vt => vt.id !== ultima) : lista;
-            const sorteada = opcoes[Math.floor(Math.random() * opcoes.length)];
+            // A lista carrega enquanto o dado cai (normalmente já está em memória)
+            const [lista] = await Promise.all([carregarVtubers(), esperar(tela ? QUEDA_DO_DADO_MS : 0)]);
+            const sorteada = sortearVtuber(lista);
             if (!sorteada) throw new Error('lista vazia');
-            try { sessionStorage.setItem('ultimaSorteada', sorteada.id); } catch { /* sem armazenamento */ }
+            if (tela) {
+                tela.classList.add('pousou');
+                tela.style.setProperty('--accent', sorteada.cor);
+                tela.querySelector('.sorte-legenda').innerHTML = `<strong>${esc(sorteada.nome)}</strong>`;
+                await esperar(BRILHO_DO_DADO_MS);
+            }
             location.href = urlPerfil(sorteada.id);
         } catch {
-            botaoSorte.disabled = false;
-            botaoSorte.classList.remove('rolando');
+            restaurarBotaoSorte();
         }
+    });
+
+    // Ao voltar para a home pelo botão "Voltar", o navegador pode restaurar a página com o dado na tela.
+    window.addEventListener('pageshow', event => {
+        if (event.persisted) restaurarBotaoSorte();
     });
 }
 
