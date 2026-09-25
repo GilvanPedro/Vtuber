@@ -84,7 +84,7 @@ async function mostrarPainel() {
     telaLogin.hidden = true;
     telaPainel.hidden = false;
     $('sair').hidden = false;
-    await recarregarLista();
+    await Promise.all([recarregarLista(), carregarTagsDoPainel()]);
 }
 
 $('form-login').addEventListener('submit', async event => {
@@ -206,17 +206,123 @@ function buscarDetalhes(id) {
 }
 
 // ---------- Editor ----------
-$('categorias').innerHTML = Object.keys(FILTROS).map(grupo => `
-    <fieldset class="filter-group">
-        <legend>${tituloDoGrupo(grupo)}</legend>
-        <div class="filter-options">
-            ${Object.keys(FILTROS[grupo].opcoes).map(valor => `
-                <label class="filter-chip">
-                    <input type="checkbox" name="${grupo}" value="${valor}">
-                    <span>${rotulo(grupo, valor)}</span>
-                </label>`).join('')}
-        </div>
-    </fieldset>`).join('');
+// Categorias (chips). As tags de conteúdo vêm do banco e podem ser cadastradas aqui.
+function montarCategorias() {
+    const marcados = new Set([...editor.querySelectorAll('#categorias input:checked')].map(i => `${i.name}:${i.value}`));
+    $('categorias').innerHTML = Object.keys(FILTROS).map(grupo => `
+        <fieldset class="filter-group">
+            <legend>${tituloDoGrupo(grupo)}</legend>
+            <div class="filter-options">
+                ${Object.keys(FILTROS[grupo].opcoes).map(valor => `
+                    <label class="filter-chip">
+                        <input type="checkbox" name="${grupo}" value="${esc(valor)}" ${marcados.has(`${grupo}:${valor}`) ? 'checked' : ''}>
+                        <span>${rotulo(grupo, valor)}</span>
+                    </label>`).join('')}
+                ${grupo === 'tags' ? `<button type="button" class="chip-add" id="abrir-nova-tag"><i class='bx bx-plus'></i>Nova tag</button>` : ''}
+            </div>
+            ${grupo === 'tags' ? `
+            <div class="nova-tag" id="nova-tag" hidden>
+                <label class="field"><span>Nome em português</span><input type="text" id="tag-pt" maxlength="30" placeholder="Ex.: Culinária" autocomplete="off"></label>
+                <label class="field"><span>Name in English</span><input type="text" id="tag-en" maxlength="30" placeholder="E.g.: Cooking" autocomplete="off"></label>
+                <div class="nova-tag-acoes">
+                    <button type="button" class="btn btn-primary btn-sm" id="salvar-tag" disabled><i class='bx bx-check'></i>Adicionar</button>
+                    <button type="button" class="btn btn-ghost btn-sm" id="cancelar-tag">Cancelar</button>
+                </div>
+                <p class="form-error" id="erro-tag" role="alert"></p>
+            </div>` : ''}
+        </fieldset>`).join('');
+}
+
+async function carregarTagsDoPainel() {
+    try {
+        aplicarTags(await chamar('admin/tags'));
+    } catch (e) {
+        toast(`Não foi possível carregar as tags: ${e.message}`, 'erro');
+    }
+    montarCategorias();
+}
+
+montarCategorias();
+
+// ---------- Nova tag ----------
+const normalizarNomeTag = texto => normalizar(texto).replace(/\s+/g, ' ').trim();
+
+// Mesma regra do servidor (lib/tags.js): nenhum nome, em nenhum idioma, pode se repetir.
+function tagRepetida(pt, en) {
+    const id = slug(pt);
+    const nomes = [pt, en].map(normalizarNomeTag).filter(Boolean);
+    const [idExistente, nomesExistentes] = Object.entries(FILTROS.tags.opcoes)
+        .find(([idTag, nome]) => idTag === id || [nome.pt, nome.en].some(n => nomes.includes(normalizarNomeTag(n)))) ?? [];
+    return idExistente ? nomesExistentes : null;
+}
+
+function validarNovaTag() {
+    const pt = $('tag-pt').value.trim();
+    const en = $('tag-en').value.trim();
+    const repetida = (pt || en) && tagRepetida(pt, en);
+    $('erro-tag').textContent = repetida ? `Já existe a tag "${repetida.pt}" (${repetida.en}).` : '';
+    $('salvar-tag').disabled = !pt || !en || Boolean(repetida) || !slug(pt);
+}
+
+function fecharNovaTag() {
+    $('nova-tag').hidden = true;
+    $('abrir-nova-tag').hidden = false;
+}
+
+async function salvarNovaTag() {
+    validarNovaTag();
+    if ($('salvar-tag').disabled) return;
+    const botao = $('salvar-tag');
+    botao.disabled = true;
+    try {
+        const { tag, tags } = await chamar('admin/tags', {
+            method: 'POST',
+            body: JSON.stringify({ pt: $('tag-pt').value, en: $('tag-en').value })
+        });
+        aplicarTags(tags);
+        montarCategorias();
+        // Já marca a tag nova na Vtuber que está sendo editada.
+        const input = editor.querySelector(`#categorias input[name="tags"][value="${CSS.escape(tag.id)}"]`);
+        if (input) input.checked = true;
+        alterado = true;
+        toast(`Tag "${tag.pt}" criada!`);
+    } catch (e) {
+        $('erro-tag').textContent = e.message;
+        botao.disabled = false;
+    }
+}
+
+// Os elementos são recriados em montarCategorias(), então os eventos ficam no contêiner.
+$('categorias').addEventListener('click', event => {
+    const alvo = event.target.closest('button');
+    if (!alvo) return;
+    if (alvo.id === 'abrir-nova-tag') {
+        alvo.hidden = true;
+        $('nova-tag').hidden = false;
+        $('tag-pt').value = '';
+        $('tag-en').value = '';
+        validarNovaTag();
+        $('tag-pt').focus();
+    } else if (alvo.id === 'cancelar-tag') {
+        fecharNovaTag();
+    } else if (alvo.id === 'salvar-tag') {
+        salvarNovaTag();
+    }
+});
+
+$('categorias').addEventListener('input', event => {
+    if (event.target.closest('#nova-tag')) validarNovaTag();
+});
+
+$('categorias').addEventListener('keydown', event => {
+    if (!event.target.closest('#nova-tag')) return;
+    if (event.key === 'Enter') {
+        event.preventDefault(); // não envia o formulário da Vtuber
+        salvarNovaTag();
+    } else if (event.key === 'Escape') {
+        fecharNovaTag();
+    }
+});
 
 function confirmarDescarte() {
     return !alterado || confirm('Há alterações não salvas. Descartar?');
@@ -318,6 +424,7 @@ $('cancelar').addEventListener('click', () => {
 });
 
 editor.addEventListener('input', event => {
+    if (event.target.closest('#nova-tag')) return; // digitar uma tag nova não altera a Vtuber
     alterado = true;
     const campos = editor.elements;
     if (event.target === campos.nome && !idEditadoManualmente) {

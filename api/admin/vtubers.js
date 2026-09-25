@@ -4,39 +4,14 @@
 //   POST   /api/admin/vtubers           -> cria
 //   PUT    /api/admin/vtubers?id=<id>   -> atualiza (pode trocar o id)
 //   DELETE /api/admin/vtubers?id=<id>   -> exclui
-import { json, erro, rota } from '../../lib/http.js';
-import { autenticado } from '../../lib/auth.js';
-import { validarVtuber, ErroValidacao } from '../../lib/validar.js';
-import {
-    listarVtubers, buscarVtuber, criarVtuber, atualizarVtuber, excluirVtuber, ErroConflito, ErroNaoEncontrado
-} from '../../lib/vtubers.js';
+import { json, erro } from '../../lib/http.js';
+import { protegida, SEM_CACHE } from '../../lib/admin.js';
+import { validarVtuber } from '../../lib/validar.js';
+import { idsDasTags } from '../../lib/tags.js';
+import { listarVtubers, buscarVtuber, criarVtuber, atualizarVtuber, excluirVtuber } from '../../lib/vtubers.js';
 
-const SEM_CACHE = { 'Cache-Control': 'no-store' };
-
-// Remove connection strings/senhas da mensagem antes de mostrar no painel.
-const mensagemSegura = e => String(e?.message || e)
-    .replace(/postgres(ql)?:\/\/\S+/gi, '<connection string>')
-    .replace(/password=\S+/gi, 'password=***')
-    .slice(0, 300);
-
-const protegida = handler => rota(async request => {
-    if (!autenticado(request)) return erro('Faça login para continuar.', 401);
-    // Bloqueia requisições vindas de outros sites (CSRF); o cookie já é SameSite=Strict.
-    const origem = request.headers.get('origin');
-    if (request.method !== 'GET' && origem && origem !== new URL(request.url).origin) {
-        return erro('Origem não permitida.', 403);
-    }
-    try {
-        return await handler(request, new URL(request.url).searchParams.get('id'));
-    } catch (e) {
-        if (e instanceof ErroConflito) return erro(e.message, 409);
-        if (e instanceof ErroNaoEncontrado) return erro(e.message, 404);
-        if (e instanceof ErroValidacao) throw e;
-        // Só quem está logado vê o motivo real (útil para diagnosticar a conexão com o banco).
-        console.error(e);
-        return erro(`Erro no servidor: ${mensagemSegura(e)}`, 500);
-    }
-});
+const lerVtuber = async request =>
+    validarVtuber(await request.json().catch(() => null), { tags: await idsDasTags() });
 
 export const GET = protegida(async (request, id) => {
     if (!id) return json(await listarVtubers(), 200, SEM_CACHE);
@@ -45,15 +20,14 @@ export const GET = protegida(async (request, id) => {
 });
 
 export const POST = protegida(async request => {
-    const vt = validarVtuber(await request.json().catch(() => null));
+    const vt = await lerVtuber(request);
     if (!vt.imagens.card) return erro('Envie a imagem do card.', 400);
     return json(await criarVtuber(vt), 201, SEM_CACHE);
 });
 
 export const PUT = protegida(async (request, id) => {
     if (!id) return erro('Vtuber não encontrada.', 404);
-    const vt = validarVtuber(await request.json().catch(() => null));
-    return json(await atualizarVtuber(id, vt), 200, SEM_CACHE);
+    return json(await atualizarVtuber(id, await lerVtuber(request)), 200, SEM_CACHE);
 });
 
 export const DELETE = protegida(async (request, id) => {

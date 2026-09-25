@@ -11,6 +11,7 @@ const urlDoSite = caminho => new URL(caminho, RAIZ_SITE).href;
 const FILTROS = {
     tags: {
         titulo: { pt: 'Conteúdo', en: 'Content' },
+        // Reserva: a lista real vem do banco (/api/tags) e substitui estas opções ao carregar.
         opcoes: {
             'just-chatting': { pt: 'Just Chatting', en: 'Just Chatting' },
             'gameplay': { pt: 'Gameplay', en: 'Gameplay' },
@@ -51,8 +52,9 @@ const idiomaAtual = () => (typeof IDIOMA !== 'undefined' ? IDIOMA : 'pt');
 
 const ICONES_PLATAFORMA = { twitch: 'bxl-twitch', youtube: 'bxl-youtube', kick: 'bx-play-circle' };
 
+// Nome da opção no idioma atual, já escapado para uso em HTML (as tags vêm do banco).
 function rotulo(grupo, valor) {
-    return FILTROS[grupo].opcoes[valor]?.[idiomaAtual()] ?? valor;
+    return esc(FILTROS[grupo].opcoes[valor]?.[idiomaAtual()] ?? valor);
 }
 
 function tituloDoGrupo(grupo) {
@@ -85,18 +87,40 @@ function renderizarBio(texto) {
 
 const urlPerfil = id => urlDoSite(`html/vtuber.html?id=${encodeURIComponent(id)}`);
 
+// Troca as opções de tags pelas cadastradas no banco: [{ id, pt, en }]
+function aplicarTags(lista) {
+    FILTROS.tags.opcoes = Object.fromEntries(lista.map(tag => [tag.id, { pt: tag.pt, en: tag.en }]));
+}
+
+let tagsEmCache;
+
+// Carrega as tags do banco; se falhar, mantém as opções de reserva.
+function carregarTags() {
+    tagsEmCache ??= fetch(urlDoSite('api/tags'))
+        .then(r => (r.ok ? r.json() : Promise.reject(new Error(`Erro ${r.status}`))))
+        .then(aplicarTags)
+        .catch(() => { tagsEmCache = undefined; });
+    return tagsEmCache;
+}
+
 let listaEmCache;
 
 async function carregarVtubers() {
-    listaEmCache ??= fetch(urlDoSite('api/vtubers')).then(r => {
-        if (!r.ok) throw new Error(`Erro ${r.status} ao carregar as Vtubers`);
-        return r.json();
-    });
+    listaEmCache ??= Promise.all([
+        fetch(urlDoSite('api/vtubers')).then(r => {
+            if (!r.ok) throw new Error(`Erro ${r.status} ao carregar as Vtubers`);
+            return r.json();
+        }),
+        carregarTags()
+    ]).then(([lista]) => lista);
     return listaEmCache;
 }
 
 async function carregarVtuber(id) {
-    const r = await fetch(urlDoSite(`api/vtubers?id=${encodeURIComponent(id)}`));
+    const [r] = await Promise.all([
+        fetch(urlDoSite(`api/vtubers?id=${encodeURIComponent(id)}`)),
+        carregarTags()
+    ]);
     if (r.status === 404) return null;
     if (!r.ok) throw new Error(`Erro ${r.status} ao carregar a Vtuber`);
     return r.json();

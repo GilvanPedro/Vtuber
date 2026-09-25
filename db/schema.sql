@@ -31,3 +31,26 @@ ALTER TABLE imagens ADD CONSTRAINT imagens_tipo_check CHECK (tipo IN ('card', 'm
 
 -- Bio em inglês (adicionada depois; não altera dados existentes)
 ALTER TABLE vtubers ADD COLUMN IF NOT EXISTS bio_en TEXT NOT NULL DEFAULT '';
+
+-- Tags de conteúdo (cadastráveis pelo painel). O id é gerado a partir do nome em português.
+CREATE TABLE IF NOT EXISTS tags (
+    id        TEXT PRIMARY KEY,
+    nome_pt   TEXT NOT NULL,
+    nome_en   TEXT NOT NULL,
+    ordem     INT GENERATED ALWAYS AS IDENTITY,
+    criado_em TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Segurança extra contra nomes repetidos (a validação completa, sem acentos, fica em lib/tags.js)
+CREATE UNIQUE INDEX IF NOT EXISTS tags_nome_pt_unico ON tags (lower(nome_pt));
+CREATE UNIQUE INDEX IF NOT EXISTS tags_nome_en_unico ON tags (lower(nome_en));
+
+-- Tags iniciais
+INSERT INTO tags (id, nome_pt, nome_en) VALUES
+    ('just-chatting', 'Just Chatting', 'Just Chatting'),
+    ('gameplay', 'Gameplay', 'Gameplay'),
+    ('react', 'React', 'React'),
+    ('asmr', 'ASMR', 'ASMR'),
+    ('musica', 'Música', 'Music'),
+    ('arte', 'Arte', 'Art')
+ON CONFLICT (id) DO NOTHING;

@@ -1794,6 +1794,52 @@ code {
     cursor: pointer;
 }
 
+.chip-add {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px dashed var(--text-dim);
+    background: none;
+    color: var(--secondary);
+    font-size: 0.9rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.chip-add:hover {
+    border-color: var(--secondary);
+    background: color-mix(in srgb, var(--secondary) 10%, transparent);
+}
+
+.nova-tag {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 14px;
+    padding: 16px;
+    border-radius: var(--radius);
+    background: var(--bg-soft);
+    border: 1px solid var(--border-strong);
+}
+
+.nova-tag-acoes,
+.nova-tag .form-error {
+    grid-column: 1 / -1;
+}
+
+.nova-tag-acoes {
+    display: flex;
+    gap: 8px;
+}
+
+@media (max-width: 720px) {
+    .nova-tag {
+        grid-template-columns: 1fr;
+    }
+}
+
 .tabs {
     display: flex;
     gap: 6px;

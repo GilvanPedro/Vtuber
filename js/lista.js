@@ -27,8 +27,9 @@ const estado = {
 
 const normalizar = texto => texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 
-// ---------- Montagem dos filtros ----------
-gruposEl.innerHTML = GRUPOS.map(grupo => `
+// ---------- Montagem dos filtros (depois de carregar as tags do banco) ----------
+function montarFiltros() {
+    gruposEl.innerHTML = GRUPOS.map(grupo => `
     <fieldset class="filter-group">
         <legend>${tituloDoGrupo(grupo)}</legend>
         <div class="filter-options">
@@ -39,6 +40,7 @@ gruposEl.innerHTML = GRUPOS.map(grupo => `
                 </label>`).join('')}
         </div>
     </fieldset>`).join('');
+}
 
 // ---------- Estado <-> URL (permite compartilhar e voltar com o navegador) ----------
 function lerUrl() {
@@ -236,6 +238,8 @@ carregarVtubers()
     .then(lista => {
         VTUBERS = lista;
         carregado = true;
+        montarFiltros();
+        lerUrl(); // de novo, agora que as tags existem (marca os filtros que vieram na URL)
         render();
     })
     .catch(() => {

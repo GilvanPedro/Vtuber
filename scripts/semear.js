@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { sql } from '../lib/db.js';
 import { validarVtuber } from '../lib/validar.js';
 import { existe, criarVtuber } from '../lib/vtubers.js';
+import { idsDasTags } from '../lib/tags.js';
 
 const raiz = new URL('../', import.meta.url);
 const MIMES = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif' };
@@ -23,6 +24,7 @@ export async function aplicarSchema() {
 export async function semear({ log = console.log } = {}) {
     await aplicarSchema();
 
+    const tags = await idsDasTags();
     const seed = JSON.parse(await readFile(new URL('db/seed.json', raiz), 'utf8'));
     let criadas = 0;
     for (const [i, item] of seed.entries()) {
@@ -33,7 +35,7 @@ export async function semear({ log = console.log } = {}) {
         const vt = validarVtuber({
             ...item,
             imagens: { card: await dataUrl(item.imagem_card), perfil: await dataUrl(item.imagem_perfil) }
-        });
+        }, { tags });
         // Mantém a ordem original: o primeiro do arquivo é o mais recente.
         await criarVtuber(vt, new Date(Date.now() - i * 60_000).toISOString());
         criadas++;
