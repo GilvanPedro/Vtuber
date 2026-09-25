@@ -12,10 +12,10 @@ if (menuToggle) {
 // Home: Vtubers recém-adicionadas
 const recentes = document.getElementById('recentes');
 if (recentes) {
-    recentes.replaceChildren(...cardsCarregando(5));
+    recentes.replaceChildren(...cardsCarregando(6));
     carregarVtubers()
         .then(lista => {
-            recentes.replaceChildren(...lista.slice(0, 5).map(criarCardVtuber));
+            recentes.replaceChildren(...lista.slice(0, 6).map(criarCardVtuber));
             document.getElementById('total-vtubers').textContent = lista.length;
             document.getElementById('total-plataformas').textContent = Object.keys(FILTROS.plataforma.opcoes).length;
         })
@@ -82,6 +82,7 @@ async function carregarPerfil(id) {
                 <div>
                     <a class="back-link" href="./vtubers.html"><i class='bx bx-chevron-left'></i>${t('perfil.voltar')}</a>
                     <h1 class="profile-name">${esc(vt.nome)}</h1>
+                    <div class="profile-stats" id="perfil-stats" hidden></div>
                     <div class="profile-facts" id="perfil-fatos">${htmlDosFatos(vt)}</div>
                     <div id="perfil-agenda">${htmlDaAgenda(vt)}</div>
                     <div class="socials">${redes}</div>
@@ -103,6 +104,45 @@ async function carregarPerfil(id) {
                 </div>` : ''}
             </div>
         </section>`;
+
+    acompanharEstatisticas(vt);
+}
+
+// ---------- Seguidores na Twitch e inscritos no YouTube ----------
+const INTERVALO_ESTATISTICAS_MS = 15 * 60 * 1000; // o servidor guarda os números por 15 minutos
+
+function formatarNumero(valor, compacto) {
+    return new Intl.NumberFormat(document.documentElement.lang || 'pt-BR',
+        compacto ? { notation: 'compact', maximumFractionDigits: 1 } : {}).format(valor);
+}
+
+function renderEstatisticas({ twitch, youtube }) {
+    const contadores = [
+        [twitch, 'stat-twitch', 'bxl-twitch', t('stats.seguidores')],
+        [youtube, 'stat-youtube', 'bxl-youtube', t('stats.inscritos')]
+    ].filter(([valor]) => typeof valor === 'number');
+    const el = document.getElementById('perfil-stats');
+    if (!el) return;
+    el.hidden = contadores.length === 0;
+    el.innerHTML = contadores.map(([valor, classe, icone, rotuloStat]) => `
+        <div class="stat ${classe}" title="${formatarNumero(valor)} ${rotuloStat}">
+            <i class='bx ${icone}'></i>
+            <strong>${formatarNumero(valor, true)}</strong>
+            <span>${rotuloStat}</span>
+        </div>`).join('');
+}
+
+// Busca os números agora e de novo a cada 15 minutos enquanto a página estiver aberta.
+function acompanharEstatisticas(vt) {
+    if (!vt.redes.twitch && !vt.redes.youtube) return;
+    const atualizar = () => fetch(urlDoSite(`api/estatisticas?id=${encodeURIComponent(vt.id)}`))
+        .then(r => (r.ok ? r.json() : null))
+        .then(dados => dados && renderEstatisticas(dados))
+        .catch(() => { /* sem números: o bloco continua escondido */ });
+    atualizar();
+    setInterval(() => {
+        if (document.visibilityState === 'visible') atualizar();
+    }, INTERVALO_ESTATISTICAS_MS);
 }
 
 // Conteúdo, horário (no fuso escolhido), plataforma e idioma

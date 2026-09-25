@@ -6,13 +6,15 @@
     "dev": "node scripts/dev.mjs",
     "seed": "node scripts/seed.mjs",
     "otimizar-imagens": "node scripts/otimizar-imagens.mjs",
-    "migrar": "node scripts/migrar.mjs"
+    "migrar": "node scripts/migrar.mjs",
+    "testar-estatisticas": "node scripts/testar-estatisticas.mjs"
   },
   "engines": {
     "node": ">=20"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.0",
+    "@vercel/functions": "^3.9.9",
     "sharp": "^0.35.4"
   },
   "devDependencies": {

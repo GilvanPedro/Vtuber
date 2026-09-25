@@ -85,6 +85,18 @@ Sem `DATABASE_URL`, o `npm run dev` usa um banco temporário em memória já com
 5. Faça um novo deploy (**Deployments → Redeploy**). O site fica em `https://<projeto>.vercel.app`
    e o painel em `https://<projeto>.vercel.app/admin`.
 
+## Seguidores e inscritos no perfil
+
+O perfil mostra os seguidores na Twitch e os inscritos no YouTube, usando os links cadastrados em
+"Redes sociais". Os números ficam 15 minutos em cache e o perfil aberto se atualiza sozinho. Para ativar,
+adicione estas variáveis no `.env` e na Vercel (sem elas, o bloco simplesmente não aparece):
+
+- `TWITCH_CLIENT_ID` e `TWITCH_CLIENT_SECRET`: crie um app em https://dev.twitch.tv/console/apps
+  (categoria "Website Integration", OAuth Redirect URL `http://localhost`) e copie o Client ID e um novo Client Secret.
+- `YOUTUBE_API_KEY`: no Google Cloud Console, ative a "YouTube Data API v3" e crie uma chave em Credenciais.
+
+Para testar as chaves: `npm run testar-estatisticas -- https://www.twitch.tv/<canal> https://www.youtube.com/@<canal>`
+
 ## Idiomas (PT / EN)
 
 O visitante escolhe o idioma no botão **PT | EN** do cabeçalho (a escolha fica salva no navegador; na
@@ -109,7 +121,7 @@ Em `/admin`, depois de entrar com a senha, você pode:
 O servidor converte cada imagem enviada para WEBP em três tamanhos: card (lista), miniatura (lista do painel) e perfil.
 Se houver imagens antigas no banco em outro formato, rode `npm run otimizar-imagens` para convertê-las. Na bio, separe
 parágrafos com uma linha em branco, use `**texto**` para negrito e `==texto==` para destacar na cor da VTuber.
-Alterações aparecem no site em até 1 minuto (cache da CDN).
+Ao salvar, o painel limpa o cache da Vercel, então as alterações aparecem no site na hora.
 
 ## Tecnologias Utilizadas
 
