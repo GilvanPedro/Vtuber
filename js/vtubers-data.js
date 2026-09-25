@@ -1,6 +1,5 @@
 /*
  * Dados das Vtubers: opções de filtro e acesso à API (os dados ficam no banco Neon).
- * As chaves de FILTROS precisam bater com OPCOES em lib/validar.js.
  */
 
 // Raiz do site, calculada a partir deste arquivo (js/vtubers-data.js), para os links
@@ -8,48 +7,63 @@
 const RAIZ_SITE = new URL('../', document.currentScript.src);
 const urlDoSite = caminho => new URL(caminho, RAIZ_SITE).href;
 
+// Rótulos em português e inglês. As chaves precisam bater com OPCOES em lib/validar.js.
 const FILTROS = {
     tags: {
-        titulo: 'Conteúdo',
+        titulo: { pt: 'Conteúdo', en: 'Content' },
         opcoes: {
-            'just-chatting': 'Just Chatting',
-            'gameplay': 'Gameplay',
-            'react': 'React',
-            'asmr': 'ASMR',
-            'musica': 'Música',
-            'arte': 'Arte'
+            'just-chatting': { pt: 'Just Chatting', en: 'Just Chatting' },
+            'gameplay': { pt: 'Gameplay', en: 'Gameplay' },
+            'react': { pt: 'React', en: 'React' },
+            'asmr': { pt: 'ASMR', en: 'ASMR' },
+            'musica': { pt: 'Música', en: 'Music' },
+            'arte': { pt: 'Arte', en: 'Art' }
         }
     },
     horario: {
-        titulo: 'Horário',
+        titulo: { pt: 'Horário', en: 'Schedule' },
         opcoes: {
-            'manha': 'Manhã',
-            'tarde': 'Tarde',
-            'noite': 'Noite',
-            'madrugada': 'Madrugada'
+            'manha': { pt: 'Manhã', en: 'Morning' },
+            'tarde': { pt: 'Tarde', en: 'Afternoon' },
+            'noite': { pt: 'Noite', en: 'Evening' },
+            'madrugada': { pt: 'Madrugada', en: 'Late night' }
         }
     },
     plataforma: {
-        titulo: 'Plataforma',
+        titulo: { pt: 'Plataforma', en: 'Platform' },
         opcoes: {
-            'twitch': 'Twitch',
-            'youtube': 'YouTube',
-            'kick': 'Kick'
+            'twitch': { pt: 'Twitch', en: 'Twitch' },
+            'youtube': { pt: 'YouTube', en: 'YouTube' },
+            'kick': { pt: 'Kick', en: 'Kick' }
         }
     },
     idioma: {
-        titulo: 'Idioma',
+        titulo: { pt: 'Idioma', en: 'Language' },
         opcoes: {
-            'portugues': 'Português',
-            'ingles': 'Inglês'
+            'portugues': { pt: 'Português', en: 'Portuguese' },
+            'ingles': { pt: 'Inglês', en: 'English' }
         }
     }
 };
 
+// Idioma atual (definido por js/i18n.js nas páginas públicas; o painel admin fica em português).
+const idiomaAtual = () => (typeof IDIOMA !== 'undefined' ? IDIOMA : 'pt');
+
 const ICONES_PLATAFORMA = { twitch: 'bxl-twitch', youtube: 'bxl-youtube', kick: 'bx-play-circle' };
 
 function rotulo(grupo, valor) {
-    return FILTROS[grupo].opcoes[valor] || valor;
+    return FILTROS[grupo].opcoes[valor]?.[idiomaAtual()] ?? valor;
+}
+
+function tituloDoGrupo(grupo) {
+    return FILTROS[grupo].titulo[idiomaAtual()];
+}
+
+// Bio no idioma escolhido. Sem versão em inglês, usa a em português (fallback = true).
+function bioNoIdioma(vt) {
+    const querIngles = idiomaAtual() === 'en';
+    if (querIngles && vt.bioEn?.trim()) return { texto: vt.bioEn, fallback: false };
+    return { texto: vt.bio, fallback: querIngles && Boolean(vt.bio?.trim()) };
 }
 
 // Escapa texto vindo do banco antes de colocar em HTML.

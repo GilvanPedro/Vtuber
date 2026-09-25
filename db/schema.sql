@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS vtubers (
     horario       JSONB NOT NULL DEFAULT '[]',
     plataforma    JSONB NOT NULL DEFAULT '[]',
     idioma        JSONB NOT NULL DEFAULT '[]',
-    bio           TEXT NOT NULL DEFAULT '',        -- parágrafos separados por linha em branco; **negrito** e ==destaque==
+    bio           TEXT NOT NULL DEFAULT '',        -- em português; parágrafos separados por linha em branco; **negrito** e ==destaque==
+    bio_en        TEXT NOT NULL DEFAULT '',        -- mesma bio em inglês (vazia = site mostra a versão em português)
     redes         JSONB NOT NULL DEFAULT '{}',     -- { twitch, youtube, x, kick }
     videos        JSONB NOT NULL DEFAULT '[]',     -- [{ id: '<id do YouTube>', vertical: bool }]
     criado_em     TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -27,3 +28,6 @@ CREATE TABLE IF NOT EXISTS imagens (
 -- Tipos de imagem aceitos (recriada para bancos criados antes do tipo 'mini')
 ALTER TABLE imagens DROP CONSTRAINT IF EXISTS imagens_tipo_check;
 ALTER TABLE imagens ADD CONSTRAINT imagens_tipo_check CHECK (tipo IN ('card', 'mini', 'perfil'));
+
+-- Bio em inglês (adicionada depois; não altera dados existentes)
+ALTER TABLE vtubers ADD COLUMN IF NOT EXISTS bio_en TEXT NOT NULL DEFAULT '';

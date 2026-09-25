@@ -180,7 +180,43 @@ h3 {
     height: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 12px;
+}
+
+.site-header .logo {
+    margin-right: auto;
+}
+
+.lang-switch {
+    display: inline-flex;
+    padding: 3px;
+    border-radius: 999px;
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--border-strong);
+}
+
+.lang-switch button {
+    min-width: 40px;
+    height: 32px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.lang-switch button:hover {
+    color: var(--text);
+}
+
+.lang-switch button[aria-pressed="true"] {
+    background: var(--gradient);
+    color: #1a0f22;
 }
 
 .logo {
@@ -990,6 +1026,23 @@ fieldset.filter-group {
     background: var(--accent);
 }
 
+.bio-note {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: var(--surface-2);
+    color: var(--text-muted);
+    font-size: 0.88rem;
+}
+
+.bio-note i {
+    font-size: 1.15rem;
+    color: var(--secondary);
+}
+
 .bio p + p {
     margin-top: 14px;
 }
@@ -1154,6 +1207,15 @@ fieldset.filter-group {
 
 .steps strong {
     color: var(--text);
+}
+
+.form-lang-note {
+    color: var(--text-dim);
+    font-size: 0.88rem;
+}
+
+.form-lang-note:empty {
+    display: none;
 }
 
 .form-card {
@@ -1587,6 +1649,12 @@ code {
     padding: 12px 8px;
 }
 
+.admin-error {
+    color: #ff7b8e;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
 .editor {
     display: grid;
     gap: 26px;
@@ -1724,6 +1792,49 @@ code {
 
 .image-field label.btn {
     cursor: pointer;
+}
+
+.tabs {
+    display: flex;
+    gap: 6px;
+    border-bottom: 1px solid var(--border);
+}
+
+.tabs [role="tab"] {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    margin-bottom: -1px;
+    border: 1px solid transparent;
+    border-radius: 12px 12px 0 0;
+    background: none;
+    color: var(--text-muted);
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.tabs [role="tab"][aria-selected="true"] {
+    color: var(--text);
+    background: var(--bg-soft);
+    border-color: var(--border-strong);
+    border-bottom-color: var(--bg-soft);
+}
+
+.tab-status {
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+}
+
+.tab-status.pendente {
+    background: rgba(255, 180, 60, 0.18);
+    color: #ffc266;
+}
+
+.tab-status.ok {
+    background: rgba(62, 207, 142, 0.18);
+    color: #3ecf8e;
 }
 
 .video-rows {

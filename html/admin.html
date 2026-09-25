@@ -123,11 +123,21 @@
 
                     <fieldset class="editor-section">
                         <legend>Bio</legend>
-                        <label class="field">
-                            <span class="sr-only">Bio</span>
-                            <textarea name="bio" rows="9" maxlength="6000"></textarea>
-                            <small>Separe parágrafos com uma linha em branco. Use <code>**texto**</code> para <strong>negrito</strong> e <code>==texto==</code> para destacar na cor da Vtuber.</small>
+                        <div class="tabs" role="tablist" aria-label="Idioma da bio">
+                            <button type="button" role="tab" id="aba-bio-pt" aria-controls="painel-bio-pt" aria-selected="true">🇧🇷 Português</button>
+                            <button type="button" role="tab" id="aba-bio-en" aria-controls="painel-bio-en" aria-selected="false" tabindex="-1">
+                                🇺🇸 English <span class="tab-status" id="status-bio-en"></span>
+                            </button>
+                        </div>
+                        <label class="field" role="tabpanel" id="painel-bio-pt" aria-labelledby="aba-bio-pt">
+                            <span class="sr-only">Bio em português</span>
+                            <textarea name="bio" rows="9" maxlength="6000" lang="pt-BR" placeholder="Bio em português..."></textarea>
                         </label>
+                        <label class="field" role="tabpanel" id="painel-bio-en" aria-labelledby="aba-bio-en" hidden>
+                            <span class="sr-only">Bio em inglês</span>
+                            <textarea name="bioEn" rows="9" maxlength="6000" lang="en" placeholder="Bio in English..."></textarea>
+                        </label>
+                        <small class="hint">Separe parágrafos com uma linha em branco. Use <code>**texto**</code> para <strong>negrito</strong> e <code>==texto==</code> para destacar na cor da Vtuber. Se a versão em inglês ficar vazia, quem escolher inglês vê a bio em português com um aviso.</small>
                     </fieldset>
 
                     <fieldset class="editor-section">

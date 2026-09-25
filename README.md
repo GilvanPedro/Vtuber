@@ -9,6 +9,7 @@ Este projeto é uma coleção de páginas web dedicadas a diferentes VTubers, co
 - [Estrutura de Pastas](#estrutura-de-pastas)
 - [Rodando localmente](#rodando-localmente)
 - [Publicando na internet](#publicando-na-internet-neon--vercel-grátis)
+- [Idiomas](#idiomas-pt--en)
 - [Painel admin](#painel-admin)
 - [Tecnologias Utilizadas](#tecnologias-utilizadas)
 - [Contribuição](#contribuição)
@@ -39,7 +40,8 @@ Este projeto foi criado para apresentar perfis de VTubers em páginas HTML indiv
 │   ├── vtubers-data.js         # Filtros, acesso à API e card de VTuber
 │   ├── lista.js                # Busca, filtros e paginação da lista
 │   ├── script.js               # Menu mobile, home e página de perfil
-│   └── admin.js                # Painel admin
+│   ├── admin.js                # Painel admin
+│   └── i18n.js                 # Textos do site em português e inglês + seletor PT | EN
 ├── api/                        # Funções serverless (Vercel) que falam com o banco
 ├── lib/                        # Código compartilhado da API (banco, login, validação)
 ├── db/
@@ -82,6 +84,18 @@ Sem `DATABASE_URL`, o `npm run dev` usa um banco temporário em memória já com
      (`node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
 5. Faça um novo deploy (**Deployments → Redeploy**). O site fica em `https://<projeto>.vercel.app`
    e o painel em `https://<projeto>.vercel.app/admin`.
+
+## Idiomas (PT / EN)
+
+O visitante escolhe o idioma no botão **PT | EN** do cabeçalho (a escolha fica salva no navegador; na
+primeira visita vale o idioma do navegador). Os textos fixos ficam em `js/i18n.js`: para mudar ou adicionar
+um texto, edite as duas versões (`pt` e `en`) e use `data-i18n="chave"` no HTML ou `t('chave')` no JS.
+A bio de cada VTuber é cadastrada nos dois idiomas no painel; sem a versão em inglês, o site mostra a em
+português com um aviso.
+
+## Atualizando o banco
+
+Quando o `db/schema.sql` ganhar tabelas ou colunas novas, rode `npm run migrar` (só adiciona, não apaga dados).
 
 ## Painel admin
 

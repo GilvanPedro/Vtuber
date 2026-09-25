@@ -19,7 +19,7 @@ if (recentes) {
             document.getElementById('total-vtubers').textContent = lista.length;
         })
         .catch(() => {
-            recentes.innerHTML = '<p class="section-sub">Não foi possível carregar as Vtubers agora.</p>';
+            recentes.innerHTML = `<p class="section-sub">${t('home.erro')}</p>`;
         });
 }
 
@@ -34,15 +34,15 @@ async function carregarPerfil(id) {
     try {
         vt = id ? await carregarVtuber(id) : null;
     } catch {
-        mostrarErroPerfil('Não foi possível carregar esta Vtuber agora. Tente de novo em instantes.');
+        mostrarErroPerfil(t('perfil.erro'));
         return;
     }
     if (!vt) {
-        mostrarErroPerfil('Essa Vtuber não existe ou foi removida do site.');
+        mostrarErroPerfil(t('perfil.naoExiste'));
         return;
     }
 
-    document.title = `${vt.nome} · Vtuber Search`;
+    document.title = t('perfil.title', { nome: vt.nome });
     document.documentElement.style.setProperty('--accent', vt.cor);
 
     const fatos = [
@@ -52,7 +52,7 @@ async function carregarPerfil(id) {
         ['idioma', 'bx-globe']
     ].filter(([grupo]) => vt[grupo].length).map(([grupo, icone]) => `
         <div class="fact">
-            <span class="fact-label"><i class='bx ${icone}'></i>${FILTROS[grupo].titulo}</span>
+            <span class="fact-label"><i class='bx ${icone}'></i>${tituloDoGrupo(grupo)}</span>
             ${vt[grupo].map(v => `<span class="chip">${rotulo(grupo, v)}</span>`).join('')}
         </div>`).join('');
 
@@ -68,10 +68,12 @@ async function carregarPerfil(id) {
 
     const videos = vt.videos.map((v, i) => `
         <div class="video${v.vertical ? ' vertical' : ''}">
-            <iframe src="https://www.youtube.com/embed/${esc(v.id)}" title="Vídeo ${i + 1} de ${esc(vt.nome)}" loading="lazy"
+            <iframe src="https://www.youtube.com/embed/${esc(v.id)}" title="${esc(t('perfil.video', { n: i + 1, nome: vt.nome }))}" loading="lazy"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
         </div>`);
+
+    const bio = bioNoIdioma(vt);
 
     const imagem = vt.imgPerfil
         ? `<img src="${esc(urlDoSite(vt.imgPerfil.replace(/^\//, '')))}" alt="${esc(vt.nome)}">`
@@ -82,7 +84,7 @@ async function carregarPerfil(id) {
             <div class="container">
                 <div class="profile-art">${imagem}</div>
                 <div>
-                    <a class="back-link" href="./vtubers.html"><i class='bx bx-chevron-left'></i>Todas as Vtubers</a>
+                    <a class="back-link" href="./vtubers.html"><i class='bx bx-chevron-left'></i>${t('perfil.voltar')}</a>
                     <h1 class="profile-name">${esc(vt.nome)}</h1>
                     <div class="profile-facts">${fatos}</div>
                     <div class="socials">${redes}</div>
@@ -93,12 +95,13 @@ async function carregarPerfil(id) {
         <section class="section profile-body">
             <div class="container">
                 <article class="panel bio">
-                    <h2 class="panel-title">Sobre</h2>
-                    ${renderizarBio(vt.bio) || '<p>Bio ainda não cadastrada.</p>'}
+                    <h2 class="panel-title">${t('perfil.sobre')}</h2>
+                    ${bio.fallback ? `<p class="bio-note"><i class='bx bx-info-circle'></i>${t('perfil.bioOutroIdioma')}</p>` : ''}
+                    <div${bio.fallback ? ' lang="pt-BR"' : ''}>${renderizarBio(bio.texto) || `<p>${t('perfil.semBio')}</p>`}</div>
                 </article>
                 ${videos.length ? `
                 <div class="panel">
-                    <h2 class="panel-title">${videos.length > 1 ? 'Vídeos' : 'Em destaque'}</h2>
+                    <h2 class="panel-title">${videos.length > 1 ? t('perfil.videos') : t('perfil.destaque')}</h2>
                     <div class="video-list">${videos.join('')}</div>
                 </div>` : ''}
             </div>
@@ -110,9 +113,9 @@ function mostrarErroPerfil(mensagem) {
         <section class="section">
             <div class="container empty-state">
                 <i class='bx bx-ghost'></i>
-                <h3>Ops!</h3>
+                <h3>${t('perfil.ops')}</h3>
                 <p>${mensagem}</p>
-                <a href="./vtubers.html" class="btn btn-ghost">Ver todas as Vtubers</a>
+                <a href="./vtubers.html" class="btn btn-ghost">${t('perfil.verTodas')}</a>
             </div>
         </section>`;
 }

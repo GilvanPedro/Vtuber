@@ -119,8 +119,8 @@ async function recarregarLista() {
         vtubers = await chamar('admin/vtubers');
         montarLista();
     } catch (e) {
-        listaEl.innerHTML = '';
-        toast(e.message, 'erro');
+        listaEl.innerHTML = `<li class="admin-empty admin-error">${esc(e.message)}</li>`;
+        $('contagem').textContent = '';
     }
 }
 
@@ -206,14 +206,14 @@ function buscarDetalhes(id) {
 }
 
 // ---------- Editor ----------
-$('categorias').innerHTML = Object.entries(FILTROS).map(([grupo, { titulo, opcoes }]) => `
+$('categorias').innerHTML = Object.keys(FILTROS).map(grupo => `
     <fieldset class="filter-group">
-        <legend>${titulo}</legend>
+        <legend>${tituloDoGrupo(grupo)}</legend>
         <div class="filter-options">
-            ${Object.entries(opcoes).map(([valor, texto]) => `
+            ${Object.keys(FILTROS[grupo].opcoes).map(valor => `
                 <label class="filter-chip">
                     <input type="checkbox" name="${grupo}" value="${valor}">
-                    <span>${texto}</span>
+                    <span>${rotulo(grupo, valor)}</span>
                 </label>`).join('')}
         </div>
     </fieldset>`).join('');
@@ -247,6 +247,8 @@ function preencherResumo(vt) {
 function preencherDetalhes(vt) {
     const campos = editor.elements;
     campos.bio.value = vt?.bio ?? '';
+    campos.bioEn.value = vt?.bioEn ?? '';
+    atualizarStatusIngles();
     REDES.forEach(rede => { campos[rede].value = vt?.redes?.[rede] ?? ''; });
     videosEl.innerHTML = '';
     (vt?.videos ?? []).forEach(v => adicionarVideo(
@@ -273,6 +275,7 @@ async function abrirEditor(id) {
     const resumo = id ? vtubers.find(v => v.id === id) : null;
     preencherResumo(resumo);
     preencherDetalhes(null);
+    selecionarAba(abasBio[0]);
 
     $('nada-selecionado').hidden = true;
     editor.hidden = false;
@@ -326,6 +329,38 @@ editor.addEventListener('input', event => {
         editor.style.setProperty('--accent', campos.cor.value);
     }
 });
+
+// ---------- Abas da bio (Português / English) ----------
+const abasBio = [...editor.querySelectorAll('.tabs [role="tab"]')];
+
+function selecionarAba(aba) {
+    abasBio.forEach(outra => {
+        const ativa = outra === aba;
+        outra.setAttribute('aria-selected', ativa);
+        outra.tabIndex = ativa ? 0 : -1;
+        $(outra.getAttribute('aria-controls')).hidden = !ativa;
+    });
+}
+
+abasBio.forEach((aba, i) => {
+    aba.addEventListener('click', () => selecionarAba(aba));
+    aba.addEventListener('keydown', event => {
+        if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+        const proxima = abasBio[(i + (event.key === 'ArrowRight' ? 1 : -1) + abasBio.length) % abasBio.length];
+        selecionarAba(proxima);
+        proxima.focus();
+    });
+});
+
+// Mostra na aba "English" se a tradução ainda está faltando.
+function atualizarStatusIngles() {
+    const vazio = !editor.elements.bioEn.value.trim();
+    const status = $('status-bio-en');
+    status.textContent = vazio ? 'vazia' : '✓';
+    status.className = `tab-status ${vazio ? 'pendente' : 'ok'}`;
+}
+
+editor.elements.bioEn.addEventListener('input', atualizarStatusIngles);
 
 // ---------- Imagens ----------
 // Mostra primeiro a miniatura (já em cache pela lista) e troca pela imagem grande quando carregar.
@@ -460,6 +495,7 @@ function coletar() {
         nome: campos.nome.value.trim(),
         cor: campos.cor.value,
         bio: campos.bio.value,
+        bioEn: campos.bioEn.value,
         tags: marcados('tags'),
         horario: marcados('horario'),
         plataforma: marcados('plataforma'),
@@ -480,7 +516,7 @@ function validarNoCliente(dados) {
 
 // Atualiza a lista local com a Vtuber salva, sem buscar tudo de novo no servidor.
 function aplicarSalvo(idAnterior, salvo) {
-    const { bio, redes, videos, ...resumo } = salvo;
+    const { bio, bioEn, redes, videos, ...resumo } = salvo;
     const indice = vtubers.findIndex(v => v.id === idAnterior);
     if (indice >= 0) vtubers[indice] = resumo;
     else vtubers.unshift(resumo);

@@ -30,12 +30,12 @@ const normalizar = texto => texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLow
 // ---------- Montagem dos filtros ----------
 gruposEl.innerHTML = GRUPOS.map(grupo => `
     <fieldset class="filter-group">
-        <legend>${FILTROS[grupo].titulo}</legend>
+        <legend>${tituloDoGrupo(grupo)}</legend>
         <div class="filter-options">
-            ${Object.entries(FILTROS[grupo].opcoes).map(([valor, texto]) => `
+            ${Object.keys(FILTROS[grupo].opcoes).map(valor => `
                 <label class="filter-chip">
                     <input type="checkbox" name="${grupo}" value="${valor}">
-                    <span>${texto}</span>
+                    <span>${rotulo(grupo, valor)}</span>
                 </label>`).join('')}
         </div>
     </fieldset>`).join('');
@@ -82,7 +82,7 @@ function filtrar() {
         GRUPOS.every(g => estado.filtros[g].size === 0 || vt[g].some(v => estado.filtros[g].has(v)))
     );
     if (estado.ordem === 'az') {
-        lista.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+        lista.sort((a, b) => a.nome.localeCompare(b.nome, document.documentElement.lang));
     }
     return lista;
 }
@@ -114,11 +114,11 @@ function render() {
     vazio.hidden = lista.length > 0;
 
     if (lista.length === 0) {
-        resultado.innerHTML = 'Nenhuma Vtuber encontrada';
+        resultado.textContent = t('lista.nenhuma');
     } else if (totalPaginas > 1) {
-        resultado.innerHTML = `Mostrando <strong>${inicio + 1}–${inicio + pagina.length}</strong> de <strong>${lista.length}</strong> Vtubers`;
+        resultado.innerHTML = t('lista.mostrando', { inicio: inicio + 1, fim: inicio + pagina.length, total: lista.length });
     } else {
-        resultado.innerHTML = `<strong>${lista.length}</strong> ${lista.length === 1 ? 'Vtuber encontrada' : 'Vtubers encontradas'}`;
+        resultado.innerHTML = lista.length === 1 ? t('lista.encontrada') : t('lista.encontradas', { n: lista.length });
     }
 
     renderPaginacao(totalPaginas);
@@ -144,14 +144,14 @@ function renderPaginacao(total) {
     }
     const atual = estado.pagina;
     paginacao.innerHTML = `
-        <button type="button" data-pagina="${atual - 1}" ${atual === 1 ? 'disabled' : ''} aria-label="Página anterior">
+        <button type="button" data-pagina="${atual - 1}" ${atual === 1 ? 'disabled' : ''} aria-label="${t('lista.anterior')}">
             <i class='bx bx-chevron-left'></i>
         </button>
         ${numerosDePagina(total, atual).map(p => p === '…'
             ? `<span class="gap">…</span>`
             : `<button type="button" data-pagina="${p}" ${p === atual ? 'aria-current="page"' : ''}>${p}</button>`
         ).join('')}
-        <button type="button" data-pagina="${atual + 1}" ${atual === total ? 'disabled' : ''} aria-label="Próxima página">
+        <button type="button" data-pagina="${atual + 1}" ${atual === total ? 'disabled' : ''} aria-label="${t('lista.proxima')}">
             <i class='bx bx-chevron-right'></i>
         </button>`;
 }
@@ -230,7 +230,7 @@ window.addEventListener('resize', () => {
 lerUrl();
 colunasAtuais = colunasDoGrid();
 grid.replaceChildren(...cardsCarregando(colunasAtuais * 2));
-resultado.textContent = 'Carregando Vtubers...';
+resultado.textContent = t('lista.carregando');
 
 carregarVtubers()
     .then(lista => {
@@ -240,5 +240,5 @@ carregarVtubers()
     })
     .catch(() => {
         grid.replaceChildren();
-        resultado.textContent = 'Não foi possível carregar as Vtubers agora. Tente recarregar a página.';
+        resultado.textContent = t('lista.erro');
     });
