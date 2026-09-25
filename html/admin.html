@@ -124,12 +124,12 @@
                     <fieldset class="editor-section">
                         <legend>Agenda de lives</legend>
                         <label class="field agenda-fuso">
-                            <span>Fuso horário da vtuber (os horários abaixo estão neste fuso)</span>
+                            <span>Fuso horário da vtuber (vale para a agenda abaixo e para o Horário marcado em Categorias)</span>
                             <select name="fuso" class="select" id="fuso-vtuber"></select>
                         </label>
                         <ul class="agenda-rows" id="agenda"></ul>
                         <button type="button" class="btn btn-ghost btn-sm" id="add-horario"><i class='bx bx-plus'></i>Adicionar horário</button>
-                        <small class="hint">O site converte estes horários para o fuso escolhido por quem visita (Brasil, EUA ou Europa). Com a agenda preenchida, o período (manhã, tarde...) do filtro é calculado sozinho; sem agenda, vale o horário marcado em Categorias.</small>
+                        <small class="hint">O site converte tudo para o fuso escolhido por quem visita (Brasil, EUA ou Europa). Sem agenda, basta marcar o Horário (manhã, tarde...) em Categorias no fuso da vtuber: nos outros fusos o site troca sozinho para o período certo, marcando mais de um quando a live cai em dois. Com agenda, o período é calculado pelos horários das lives.</small>
                     </fieldset>
 
                     <fieldset class="editor-section">

@@ -282,11 +282,47 @@ const periodoDaHora = horario => {
     return hora < 6 ? 'madrugada' : hora < 12 ? 'manha' : hora < 18 ? 'tarde' : 'noite';
 };
 
-// Períodos (manhã, tarde...) da vtuber no fuso escolhido. Com agenda, são calculados a partir dela;
-// sem agenda, valem os marcados no painel. "Diverso" é sempre o marcado no painel.
+// Faixa de cada período, em horas do dia
+const FAIXAS = { madrugada: [0, 6], manha: [6, 12], tarde: [12, 18], noite: [18, 24] };
+// Um período de destino só entra se pegar pelo menos 2h da faixa convertida
+const MINIMO_SOBREPOSICAO = 120;
+
+// Diferença, em minutos, entre dois fusos agora (considera o horário de verão do momento)
+function diferencaEntreFusos(origem, destino, ms = Date.now()) {
+    const minutosLocais = fuso => {
+        const p = partesNoFuso(ms, fuso);
+        return Date.UTC(p.ano, p.mes, p.dia, p.hora, p.minuto) / 60000;
+    };
+    return minutosLocais(destino) - minutosLocais(origem);
+}
+
+// Converte períodos marcados num fuso para os períodos equivalentes em outro.
+// Ex.: "Noite" em Brasília (18h–24h) vira "Noite" + "Madrugada" na Europa no inverno (22h–04h).
+function converterPeriodos(periodos, origem, destino) {
+    const diferenca = diferencaEntreFusos(origem, destino);
+    const convertidos = new Set();
+    for (const periodo of periodos) {
+        if (!FAIXAS[periodo]) continue;
+        const inicio = FAIXAS[periodo][0] * 60 + diferenca;
+        const fim = FAIXAS[periodo][1] * 60 + diferenca;
+        for (const [destinoPeriodo, [a, b]] of Object.entries(FAIXAS)) {
+            // A faixa pode atravessar a meia-noite: compara também com o dia anterior e o seguinte
+            const sobreposicao = [-1440, 0, 1440].reduce((total, desloc) =>
+                total + Math.max(0, Math.min(fim, b * 60 + desloc) - Math.max(inicio, a * 60 + desloc)), 0);
+            if (sobreposicao >= MINIMO_SOBREPOSICAO) convertidos.add(destinoPeriodo);
+        }
+    }
+    return convertidos;
+}
+
+// Períodos (manhã, tarde...) da vtuber no fuso escolhido pelo visitante:
+// - com agenda: calculados a partir dos horários das lives;
+// - sem agenda: os marcados no painel (no fuso da vtuber, padrão Brasília), convertidos para o fuso escolhido.
+// "Diverso" é sempre o marcado no painel.
 function periodosDaVtuber(vt, destino = fusoAtual()) {
-    if (!vt.agenda?.length) return vt.horario;
-    const periodos = new Set(agendaNoFuso(vt, destino).map(g => periodoDaHora(g.inicio)));
+    const periodos = vt.agenda?.length
+        ? new Set(agendaNoFuso(vt, destino).map(g => periodoDaHora(g.inicio)))
+        : converterPeriodos(vt.horario, vt.fuso || FUSOS[0].id, destino);
     if (vt.horario.includes('diverso')) periodos.add('diverso');
     return PERIODOS.filter(p => periodos.has(p));
 }
