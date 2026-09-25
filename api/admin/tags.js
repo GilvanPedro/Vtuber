@@ -1,6 +1,6 @@
 // Admin (precisa estar logado):
 //   GET  /api/admin/tags          -> lista (sem cache)
-//   POST /api/admin/tags { pt, en } -> cria uma tag de conteúdo; devolve a lista atualizada
+//   POST /api/admin/tags { grupo, pt, en } -> cria uma opção (grupo: tags | plataforma | idioma); devolve a lista atualizada
 import { json } from '../../lib/http.js';
 import { protegida, SEM_CACHE } from '../../lib/admin.js';
 import { listarTags, criarTag } from '../../lib/tags.js';

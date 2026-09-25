@@ -17,6 +17,7 @@ if (recentes) {
         .then(lista => {
             recentes.replaceChildren(...lista.slice(0, 5).map(criarCardVtuber));
             document.getElementById('total-vtubers').textContent = lista.length;
+            document.getElementById('total-plataformas').textContent = Object.keys(FILTROS.plataforma.opcoes).length;
         })
         .catch(() => {
             recentes.innerHTML = `<p class="section-sub">${t('home.erro')}</p>`;
@@ -56,12 +57,18 @@ async function carregarPerfil(id) {
             ${vt[grupo].map(v => `<span class="chip">${rotulo(grupo, v)}</span>`).join('')}
         </div>`).join('');
 
-    const redes = [
+    const redesFixas = [
         ['twitch', 'social-twitch', 'bxl-twitch', 'Twitch'],
         ['youtube', 'social-youtube', 'bxl-youtube', 'YouTube'],
         ['x', 'social-x', 'bxl-twitter', 'X / Twitter'],
-        ['kick', 'social-kick', 'bx-play-circle', 'Kick']
-    ].filter(([rede]) => vt.redes[rede]).map(([rede, classe, icone, nome]) => `
+        ['kick', 'social-kick', 'bx-play-circle', 'Kick'],
+        ['instagram', 'social-instagram', 'bxl-instagram', 'Instagram']
+    ];
+    // Links de plataformas cadastradas pelo painel (ex.: TikTok), com o nome e ícone da plataforma
+    const redesExtras = Object.keys(vt.redes)
+        .filter(rede => !redesFixas.some(([fixa]) => fixa === rede))
+        .map(rede => [rede, 'social-extra', iconePlataforma(rede), rotulo('plataforma', rede)]);
+    const redes = [...redesFixas, ...redesExtras].filter(([rede]) => vt.redes[rede]).map(([rede, classe, icone, nome]) => `
         <a class="social ${classe}" href="${esc(vt.redes[rede])}" target="_blank" rel="noopener">
             <i class='bx ${icone}'></i>${nome}
         </a>`).join('');

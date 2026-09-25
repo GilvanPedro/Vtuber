@@ -18,7 +18,7 @@ const videosEl = $('videos');
 const modal = $('modal-excluir');
 
 const TAMANHO_MAXIMO = { card: 1200, perfil: 1600 }; // o servidor gera as versões finais em WEBP
-const REDES = ['twitch', 'youtube', 'x', 'kick'];
+const REDES = ['twitch', 'youtube', 'x', 'kick', 'instagram'];
 
 let vtubers = [];            // lista resumida (sem bio/redes/vídeos)
 const detalhes = new Map();  // id -> Promise com os dados completos
@@ -206,7 +206,27 @@ function buscarDetalhes(id) {
 }
 
 // ---------- Editor ----------
-// Categorias (chips). As tags de conteúdo vêm do banco e podem ser cadastradas aqui.
+// Categorias (chips). Tags de conteúdo, plataformas e idiomas vêm do banco e podem ser cadastrados aqui.
+const CADASTRAVEIS = {
+    tags: { botao: 'Nova tag', criada: 'Tag "{nome}" criada!', jaExiste: 'Já existe a tag', exPt: 'Ex.: Culinária', exEn: 'E.g.: Cooking' },
+    plataforma: { botao: 'Nova plataforma', criada: 'Plataforma "{nome}" criada!', jaExiste: 'Já existe a plataforma', exPt: 'Ex.: TikTok', exEn: 'E.g.: TikTok' },
+    idioma: { botao: 'Novo idioma', criada: 'Idioma "{nome}" criado!', jaExiste: 'Já existe o idioma', exPt: 'Ex.: Espanhol', exEn: 'E.g.: Spanish' }
+};
+
+function formularioNovaOpcao(grupo) {
+    const config = CADASTRAVEIS[grupo];
+    return `
+        <div class="nova-tag" data-grupo="${grupo}" hidden>
+            <label class="field"><span>Nome em português</span><input type="text" class="opcao-pt" maxlength="30" placeholder="${config.exPt}" autocomplete="off"></label>
+            <label class="field"><span>Name in English</span><input type="text" class="opcao-en" maxlength="30" placeholder="${config.exEn}" autocomplete="off"></label>
+            <div class="nova-tag-acoes">
+                <button type="button" class="btn btn-primary btn-sm" data-acao="salvar" disabled><i class='bx bx-check'></i>Adicionar</button>
+                <button type="button" class="btn btn-ghost btn-sm" data-acao="cancelar">Cancelar</button>
+            </div>
+            <p class="form-error" role="alert"></p>
+        </div>`;
+}
+
 function montarCategorias() {
     const marcados = new Set([...editor.querySelectorAll('#categorias input:checked')].map(i => `${i.name}:${i.value}`));
     $('categorias').innerHTML = Object.keys(FILTROS).map(grupo => `
@@ -218,18 +238,9 @@ function montarCategorias() {
                         <input type="checkbox" name="${grupo}" value="${esc(valor)}" ${marcados.has(`${grupo}:${valor}`) ? 'checked' : ''}>
                         <span>${rotulo(grupo, valor)}</span>
                     </label>`).join('')}
-                ${grupo === 'tags' ? `<button type="button" class="chip-add" id="abrir-nova-tag"><i class='bx bx-plus'></i>Nova tag</button>` : ''}
+                ${CADASTRAVEIS[grupo] ? `<button type="button" class="chip-add" data-acao="abrir" data-grupo="${grupo}"><i class='bx bx-plus'></i>${CADASTRAVEIS[grupo].botao}</button>` : ''}
             </div>
-            ${grupo === 'tags' ? `
-            <div class="nova-tag" id="nova-tag" hidden>
-                <label class="field"><span>Nome em português</span><input type="text" id="tag-pt" maxlength="30" placeholder="Ex.: Culinária" autocomplete="off"></label>
-                <label class="field"><span>Name in English</span><input type="text" id="tag-en" maxlength="30" placeholder="E.g.: Cooking" autocomplete="off"></label>
-                <div class="nova-tag-acoes">
-                    <button type="button" class="btn btn-primary btn-sm" id="salvar-tag" disabled><i class='bx bx-check'></i>Adicionar</button>
-                    <button type="button" class="btn btn-ghost btn-sm" id="cancelar-tag">Cancelar</button>
-                </div>
-                <p class="form-error" id="erro-tag" role="alert"></p>
-            </div>` : ''}
+            ${CADASTRAVEIS[grupo] ? formularioNovaOpcao(grupo) : ''}
         </fieldset>`).join('');
 }
 
@@ -237,90 +248,123 @@ async function carregarTagsDoPainel() {
     try {
         aplicarTags(await chamar('admin/tags'));
     } catch (e) {
-        toast(`Não foi possível carregar as tags: ${e.message}`, 'erro');
+        toast(`Não foi possível carregar as opções: ${e.message}`, 'erro');
     }
     montarCategorias();
 }
 
 montarCategorias();
 
-// ---------- Nova tag ----------
+// ---------- Links das plataformas novas (ex.: TikTok) ----------
+// Cada plataforma marcada que não está nas redes fixas ganha um campo de link em "Redes sociais".
+function linksDasRedesExtras() {
+    return Object.fromEntries([...$('redes-extras').querySelectorAll('input[data-rede]')]
+        .map(input => [input.dataset.rede, input.value.trim()]));
+}
+
+function montarRedesExtras(valores = linksDasRedesExtras()) {
+    const marcadas = [...editor.querySelectorAll('#categorias input[name="plataforma"]:checked')]
+        .map(input => input.value)
+        .filter(id => !REDES.includes(id));
+    $('redes-extras').innerHTML = marcadas.map(id => `
+        <label class="field">
+            <span><i class='bx ${iconePlataforma(id)}'></i> ${rotulo('plataforma', id)}</span>
+            <input type="url" data-rede="${esc(id)}" value="${esc(valores[id] ?? '')}" placeholder="https://...">
+        </label>`).join('');
+}
+
+// Marcar/desmarcar uma plataforma mostra/esconde o campo de link dela.
+$('categorias').addEventListener('change', event => {
+    if (event.target.name === 'plataforma') montarRedesExtras();
+});
+
+// ---------- Nova tag / plataforma / idioma ----------
 const normalizarNomeTag = texto => normalizar(texto).replace(/\s+/g, ' ').trim();
 
-// Mesma regra do servidor (lib/tags.js): nenhum nome, em nenhum idioma, pode se repetir.
-function tagRepetida(pt, en) {
+// Mesma regra do servidor (lib/tags.js): no mesmo grupo, nenhum nome (em nenhum idioma) pode se repetir.
+function opcaoRepetida(grupo, pt, en) {
     const id = slug(pt);
     const nomes = [pt, en].map(normalizarNomeTag).filter(Boolean);
-    const [idExistente, nomesExistentes] = Object.entries(FILTROS.tags.opcoes)
-        .find(([idTag, nome]) => idTag === id || [nome.pt, nome.en].some(n => nomes.includes(normalizarNomeTag(n)))) ?? [];
+    const [idExistente, nomesExistentes] = Object.entries(FILTROS[grupo].opcoes)
+        .find(([idOpcao, nome]) => idOpcao === id || [nome.pt, nome.en].some(n => nomes.includes(normalizarNomeTag(n)))) ?? [];
     return idExistente ? nomesExistentes : null;
 }
 
-function validarNovaTag() {
-    const pt = $('tag-pt').value.trim();
-    const en = $('tag-en').value.trim();
-    const repetida = (pt || en) && tagRepetida(pt, en);
-    $('erro-tag').textContent = repetida ? `Já existe a tag "${repetida.pt}" (${repetida.en}).` : '';
-    $('salvar-tag').disabled = !pt || !en || Boolean(repetida) || !slug(pt);
+const formDoGrupo = grupo => $('categorias').querySelector(`.nova-tag[data-grupo="${grupo}"]`);
+
+function validarNovaOpcao(form) {
+    const grupo = form.dataset.grupo;
+    const pt = form.querySelector('.opcao-pt').value.trim();
+    const en = form.querySelector('.opcao-en').value.trim();
+    const repetida = (pt || en) && opcaoRepetida(grupo, pt, en);
+    form.querySelector('.form-error').textContent = repetida
+        ? `${CADASTRAVEIS[grupo].jaExiste} "${repetida.pt}" (${repetida.en}).` : '';
+    form.querySelector('[data-acao="salvar"]').disabled = !pt || !en || Boolean(repetida) || !slug(pt);
 }
 
-function fecharNovaTag() {
-    $('nova-tag').hidden = true;
-    $('abrir-nova-tag').hidden = false;
+function abrirNovaOpcao(grupo) {
+    const form = formDoGrupo(grupo);
+    $('categorias').querySelector(`.chip-add[data-grupo="${grupo}"]`).hidden = true;
+    form.hidden = false;
+    form.querySelector('.opcao-pt').value = '';
+    form.querySelector('.opcao-en').value = '';
+    validarNovaOpcao(form);
+    form.querySelector('.opcao-pt').focus();
 }
 
-async function salvarNovaTag() {
-    validarNovaTag();
-    if ($('salvar-tag').disabled) return;
-    const botao = $('salvar-tag');
+function fecharNovaOpcao(form) {
+    form.hidden = true;
+    $('categorias').querySelector(`.chip-add[data-grupo="${form.dataset.grupo}"]`).hidden = false;
+}
+
+async function salvarNovaOpcao(form) {
+    validarNovaOpcao(form);
+    const botao = form.querySelector('[data-acao="salvar"]');
+    if (botao.disabled) return;
+    const grupo = form.dataset.grupo;
     botao.disabled = true;
     try {
         const { tag, tags } = await chamar('admin/tags', {
             method: 'POST',
-            body: JSON.stringify({ pt: $('tag-pt').value, en: $('tag-en').value })
+            body: JSON.stringify({ grupo, pt: form.querySelector('.opcao-pt').value, en: form.querySelector('.opcao-en').value })
         });
         aplicarTags(tags);
         montarCategorias();
-        // Já marca a tag nova na Vtuber que está sendo editada.
-        const input = editor.querySelector(`#categorias input[name="tags"][value="${CSS.escape(tag.id)}"]`);
+        // Já marca a opção nova na Vtuber que está sendo editada.
+        const input = editor.querySelector(`#categorias input[name="${grupo}"][value="${CSS.escape(tag.id)}"]`);
         if (input) input.checked = true;
+        if (grupo === 'plataforma') montarRedesExtras();
         alterado = true;
-        toast(`Tag "${tag.pt}" criada!`);
+        toast(CADASTRAVEIS[grupo].criada.replace('{nome}', tag.pt));
     } catch (e) {
-        $('erro-tag').textContent = e.message;
+        form.querySelector('.form-error').textContent = e.message;
         botao.disabled = false;
     }
 }
 
 // Os elementos são recriados em montarCategorias(), então os eventos ficam no contêiner.
 $('categorias').addEventListener('click', event => {
-    const alvo = event.target.closest('button');
+    const alvo = event.target.closest('button[data-acao]');
     if (!alvo) return;
-    if (alvo.id === 'abrir-nova-tag') {
-        alvo.hidden = true;
-        $('nova-tag').hidden = false;
-        $('tag-pt').value = '';
-        $('tag-en').value = '';
-        validarNovaTag();
-        $('tag-pt').focus();
-    } else if (alvo.id === 'cancelar-tag') {
-        fecharNovaTag();
-    } else if (alvo.id === 'salvar-tag') {
-        salvarNovaTag();
-    }
+    const form = alvo.closest('.nova-tag');
+    if (alvo.dataset.acao === 'abrir') abrirNovaOpcao(alvo.dataset.grupo);
+    else if (alvo.dataset.acao === 'cancelar') fecharNovaOpcao(form);
+    else if (alvo.dataset.acao === 'salvar') salvarNovaOpcao(form);
 });
 
 $('categorias').addEventListener('input', event => {
-    if (event.target.closest('#nova-tag')) validarNovaTag();
+    const form = event.target.closest('.nova-tag');
+    if (form) validarNovaOpcao(form);
 });
 
 $('categorias').addEventListener('keydown', event => {
-    if (!event.target.closest('#nova-tag')) return;
+    const form = event.target.closest('.nova-tag');
+    if (!form) return;
     if (event.key === 'Enter') {
         event.preventDefault(); // não envia o formulário da Vtuber
-        salvarNovaTag();
+        salvarNovaOpcao(form);
     } else if (event.key === 'Escape') {
-        fecharNovaTag();
+        fecharNovaOpcao(form);
     }
 });
 
@@ -356,6 +400,7 @@ function preencherDetalhes(vt) {
     campos.bioEn.value = vt?.bioEn ?? '';
     atualizarStatusIngles();
     REDES.forEach(rede => { campos[rede].value = vt?.redes?.[rede] ?? ''; });
+    montarRedesExtras(vt?.redes ?? {});
     videosEl.innerHTML = '';
     (vt?.videos ?? []).forEach(v => adicionarVideo(
         v.vertical ? `https://www.youtube.com/shorts/${v.id}` : `https://www.youtube.com/watch?v=${v.id}`, v.vertical));
@@ -424,7 +469,7 @@ $('cancelar').addEventListener('click', () => {
 });
 
 editor.addEventListener('input', event => {
-    if (event.target.closest('#nova-tag')) return; // digitar uma tag nova não altera a Vtuber
+    if (event.target.closest('.nova-tag')) return; // digitar uma opção nova não altera a Vtuber
     alterado = true;
     const campos = editor.elements;
     if (event.target === campos.nome && !idEditadoManualmente) {
@@ -607,7 +652,10 @@ function coletar() {
         horario: marcados('horario'),
         plataforma: marcados('plataforma'),
         idioma: marcados('idioma'),
-        redes: Object.fromEntries(REDES.map(r => [r, campos[r].value.trim()])),
+        redes: {
+            ...Object.fromEntries(REDES.map(r => [r, campos[r].value.trim()])),
+            ...linksDasRedesExtras()
+        },
         videos,
         imagens: imagensNovas
     };

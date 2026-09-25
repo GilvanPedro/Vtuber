@@ -11,7 +11,7 @@ const urlDoSite = caminho => new URL(caminho, RAIZ_SITE).href;
 const FILTROS = {
     tags: {
         titulo: { pt: 'Conteúdo', en: 'Content' },
-        // Reserva: a lista real vem do banco (/api/tags) e substitui estas opções ao carregar.
+        // Reserva (tags, plataforma e idioma): a lista real vem do banco (/api/tags) e substitui estas opções.
         opcoes: {
             'just-chatting': { pt: 'Just Chatting', en: 'Just Chatting' },
             'gameplay': { pt: 'Gameplay', en: 'Gameplay' },
@@ -51,7 +51,12 @@ const FILTROS = {
 // Idioma atual (definido por js/i18n.js nas páginas públicas; o painel admin fica em português).
 const idiomaAtual = () => (typeof IDIOMA !== 'undefined' ? IDIOMA : 'pt');
 
-const ICONES_PLATAFORMA = { twitch: 'bxl-twitch', youtube: 'bxl-youtube', kick: 'bx-play-circle' };
+// Ícones (Boxicons) das plataformas conhecidas; plataformas novas usam um ícone genérico.
+const ICONES_PLATAFORMA = {
+    twitch: 'bxl-twitch', youtube: 'bxl-youtube', kick: 'bx-play-circle', tiktok: 'bxl-tiktok',
+    instagram: 'bxl-instagram', facebook: 'bxl-facebook-circle', discord: 'bxl-discord-alt'
+};
+const iconePlataforma = id => ICONES_PLATAFORMA[id] ?? 'bx-broadcast';
 
 // Nome da opção no idioma atual, já escapado para uso em HTML (as tags vêm do banco).
 function rotulo(grupo, valor) {
@@ -89,8 +94,12 @@ function renderizarBio(texto) {
 const urlPerfil = id => urlDoSite(`html/vtuber.html?id=${encodeURIComponent(id)}`);
 
 // Troca as opções de tags pelas cadastradas no banco: [{ id, pt, en }]
+// Troca as opções de cada grupo (tags, plataforma, idioma) pelas cadastradas no banco: [{ grupo, id, pt, en }]
 function aplicarTags(lista) {
-    FILTROS.tags.opcoes = Object.fromEntries(lista.map(tag => [tag.id, { pt: tag.pt, en: tag.en }]));
+    for (const grupo of ['tags', 'plataforma', 'idioma']) {
+        const doGrupo = lista.filter(tag => (tag.grupo ?? 'tags') === grupo);
+        if (doGrupo.length) FILTROS[grupo].opcoes = Object.fromEntries(doGrupo.map(tag => [tag.id, { pt: tag.pt, en: tag.en }]));
+    }
 }
 
 let tagsEmCache;
@@ -135,7 +144,7 @@ function criarCardVtuber(vt) {
     card.style.setProperty('--accent', vt.cor);
 
     const plataformas = vt.plataforma
-        .map(p => `<i class='bx ${ICONES_PLATAFORMA[p]}' title="${rotulo('plataforma', p)}"></i>`)
+        .map(p => `<i class='bx ${iconePlataforma(p)}' title="${rotulo('plataforma', p)}"></i>`)
         .join('');
     const idiomas = vt.idioma.map(i => rotulo('idioma', i)).join(' · ');
     const tags = vt.tags.slice(0, 3).map(t => `<span class="chip">${rotulo('tags', t)}</span>`).join('');

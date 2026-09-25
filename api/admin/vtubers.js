@@ -7,11 +7,11 @@
 import { json, erro } from '../../lib/http.js';
 import { protegida, SEM_CACHE } from '../../lib/admin.js';
 import { validarVtuber } from '../../lib/validar.js';
-import { idsDasTags } from '../../lib/tags.js';
+import { opcoesPorGrupo } from '../../lib/tags.js';
 import { listarVtubers, buscarVtuber, criarVtuber, atualizarVtuber, excluirVtuber } from '../../lib/vtubers.js';
 
 const lerVtuber = async request =>
-    validarVtuber(await request.json().catch(() => null), { tags: await idsDasTags() });
+    validarVtuber(await request.json().catch(() => null), { opcoes: await opcoesPorGrupo() });
 
 export const GET = protegida(async (request, id) => {
     if (!id) return json(await listarVtubers(), 200, SEM_CACHE);
