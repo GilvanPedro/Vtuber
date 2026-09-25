@@ -1,9 +1,13 @@
 /*
  * Painel admin: login, busca, criar, editar e excluir Vtubers.
  * Fala com /api/login, /api/logout, /api/sessao e /api/admin/vtubers.
+ *
+ * Desempenho: a lista é montada uma vez (a busca só esconde itens), usa miniaturas pequenas,
+ * e os detalhes de cada Vtuber ficam em cache e são pré-carregados ao passar o mouse.
  */
 const $ = id => document.getElementById(id);
 const api = caminho => urlDoSite(`api/${caminho}`);
+const imagemUrl = caminho => (caminho ? urlDoSite(caminho.replace(/^\//, '')) : '');
 
 const telaLogin = $('tela-login');
 const telaPainel = $('tela-painel');
@@ -13,12 +17,14 @@ const buscaEl = $('busca-admin');
 const videosEl = $('videos');
 const modal = $('modal-excluir');
 
-const TAMANHO_MAXIMO = { card: 900, perfil: 1400 }; // maior lado da imagem, em px
+const TAMANHO_MAXIMO = { card: 1200, perfil: 1600 }; // o servidor gera as versões finais em WEBP
 const REDES = ['twitch', 'youtube', 'x', 'kick'];
 
-let vtubers = [];
-let atual = null;          // id da vtuber em edição (null = nova)
-let imagensNovas = {};     // { card?: dataUrl, perfil?: dataUrl }
+let vtubers = [];            // lista resumida (sem bio/redes/vídeos)
+const detalhes = new Map();  // id -> Promise com os dados completos
+let atual = null;            // id da vtuber em edição (null = nova)
+let pedidoAtual = 0;         // descarta respostas de cliques anteriores
+let imagensNovas = {};       // { card?: dataUrl, perfil?: dataUrl }
 let idEditadoManualmente = false;
 let alterado = false;
 
@@ -101,47 +107,103 @@ $('sair').addEventListener('click', async () => {
     if (alterado && !confirm('Há alterações não salvas. Sair mesmo assim?')) return;
     await chamar('logout', { method: 'POST' }).catch(() => {});
     alterado = false;
+    detalhes.clear();
     fecharEditor();
     mostrarLogin();
 });
 
 // ---------- Lista + busca ----------
 async function recarregarLista() {
+    listaEl.innerHTML = '<li class="admin-empty">Carregando...</li>';
     try {
         vtubers = await chamar('admin/vtubers');
-        renderLista();
+        montarLista();
     } catch (e) {
+        listaEl.innerHTML = '';
         toast(e.message, 'erro');
     }
 }
 
-function renderLista() {
-    const termo = normalizar(buscaEl.value.trim());
-    const filtradas = vtubers.filter(vt => !termo || normalizar(`${vt.nome} ${vt.id}`).includes(termo));
-    $('contagem').textContent = termo
-        ? `${filtradas.length} de ${vtubers.length} Vtubers`
-        : `${vtubers.length} Vtubers cadastradas`;
-
-    listaEl.innerHTML = filtradas.map(vt => `
-        <li>
-            <button type="button" data-id="${esc(vt.id)}" ${vt.id === atual ? 'aria-current="true"' : ''} style="--accent:${esc(vt.cor)}">
-                <span class="admin-thumb">${vt.img ? `<img src="${esc(urlDoSite(vt.img.replace(/^\//, '')))}" alt="" loading="lazy">` : ''}</span>
-                <span class="admin-item-text">
-                    <strong>${esc(vt.nome)}</strong>
-                    <small>${esc(vt.id)}</small>
-                </span>
-            </button>
-        </li>`).join('') || '<li class="admin-empty">Nenhuma Vtuber encontrada.</li>';
+function itemDaLista(vt) {
+    const li = document.createElement('li');
+    li.dataset.busca = normalizar(`${vt.nome} ${vt.id}`);
+    li.innerHTML = `
+        <button type="button" data-id="${esc(vt.id)}" style="--accent:${esc(vt.cor)}">
+            <span class="admin-thumb">${vt.imgMini
+                ? `<img src="${esc(imagemUrl(vt.imgMini))}" alt="" loading="lazy" decoding="async" width="44" height="44">`
+                : ''}</span>
+            <span class="admin-item-text">
+                <strong>${esc(vt.nome)}</strong>
+                <small>${esc(vt.id)}</small>
+            </span>
+        </button>`;
+    return li;
 }
 
-buscaEl.addEventListener('input', renderLista);
+// Monta a lista inteira (só quando os dados mudam).
+function montarLista() {
+    listaEl.replaceChildren(...vtubers.map(itemDaLista));
+    const vazio = document.createElement('li');
+    vazio.className = 'admin-empty';
+    vazio.id = 'lista-vazia';
+    vazio.textContent = 'Nenhuma Vtuber encontrada.';
+    listaEl.appendChild(vazio);
+    filtrarLista();
+    marcarSelecionada();
+}
+
+// Busca: só mostra/esconde os itens já existentes.
+function filtrarLista() {
+    const termo = normalizar(buscaEl.value.trim());
+    let visiveis = 0;
+    for (const li of listaEl.querySelectorAll('li[data-busca]')) {
+        li.hidden = Boolean(termo) && !li.dataset.busca.includes(termo);
+        if (!li.hidden) visiveis++;
+    }
+    $('lista-vazia').hidden = visiveis > 0;
+    $('contagem').textContent = termo
+        ? `${visiveis} de ${vtubers.length} Vtubers`
+        : `${vtubers.length} Vtubers cadastradas`;
+}
+
+function marcarSelecionada() {
+    listaEl.querySelectorAll('button[data-id]').forEach(botao => {
+        if (botao.dataset.id === atual) botao.setAttribute('aria-current', 'true');
+        else botao.removeAttribute('aria-current');
+    });
+}
+
+let timerBusca;
+buscaEl.addEventListener('input', () => {
+    clearTimeout(timerBusca);
+    timerBusca = setTimeout(filtrarLista, 80);
+});
 
 listaEl.addEventListener('click', event => {
     const botao = event.target.closest('button[data-id]');
     if (botao) abrirEditor(botao.dataset.id);
 });
 
+// Pré-carrega os detalhes quando o mouse/foco para sobre um item.
+let timerPrefetch;
+function prefetch(event) {
+    const botao = event.target.closest?.('button[data-id]');
+    clearTimeout(timerPrefetch);
+    if (botao) timerPrefetch = setTimeout(() => buscarDetalhes(botao.dataset.id).catch(() => {}), 120);
+}
+listaEl.addEventListener('pointerover', prefetch);
+listaEl.addEventListener('focusin', prefetch);
+
 $('nova').addEventListener('click', () => abrirEditor(null));
+
+function buscarDetalhes(id) {
+    if (!detalhes.has(id)) {
+        const pedido = chamar(`admin/vtubers?id=${encodeURIComponent(id)}`);
+        detalhes.set(id, pedido);
+        pedido.catch(() => detalhes.delete(id));
+    }
+    return detalhes.get(id);
+}
 
 // ---------- Editor ----------
 $('categorias').innerHTML = Object.entries(FILTROS).map(([grupo, { titulo, opcoes }]) => `
@@ -160,62 +222,90 @@ function confirmarDescarte() {
     return !alterado || confirm('Há alterações não salvas. Descartar?');
 }
 
-async function abrirEditor(id) {
-    if (!confirmarDescarte()) return;
-
-    let vt = null;
-    if (id) {
-        try {
-            vt = await chamar(`admin/vtubers?id=${encodeURIComponent(id)}`);
-        } catch (e) {
-            toast(e.message, 'erro');
-            return;
-        }
-    }
-
-    atual = id;
-    imagensNovas = {};
-    idEditadoManualmente = Boolean(id);
-    $('erro-editor').textContent = '';
-
+// Preenche os campos que já existem na lista (nome, cor, categorias, imagens).
+function preencherResumo(vt) {
     const campos = editor.elements;
     campos.nome.value = vt?.nome ?? '';
     campos.id.value = vt?.id ?? '';
     campos.cor.value = vt?.cor ?? '#e45fd9';
     $('cor-hex').textContent = campos.cor.value;
-    campos.bio.value = vt?.bio ?? '';
-    REDES.forEach(rede => { campos[rede].value = vt?.redes?.[rede] ?? ''; });
+    editor.style.setProperty('--accent', campos.cor.value);
     editor.querySelectorAll('#categorias input').forEach(input => {
         input.checked = Boolean(vt?.[input.name]?.includes(input.value));
     });
-
-    mostrarImagem('card', vt?.img);
+    mostrarImagem('card', vt?.img, vt?.imgMini);
     mostrarImagem('perfil', vt?.imgPerfil && vt.imgPerfil !== vt.img ? vt.imgPerfil : null);
-
-    videosEl.innerHTML = '';
-    (vt?.videos ?? []).forEach(v => adicionarVideo(
-        v.vertical ? `https://www.youtube.com/shorts/${v.id}` : `https://www.youtube.com/watch?v=${v.id}`, v.vertical));
 
     $('editor-modo').textContent = vt ? 'Editando' : 'Cadastro';
     $('editor-titulo').textContent = vt ? vt.nome : 'Nova Vtuber';
     $('excluir').hidden = !vt;
     $('ver-perfil').hidden = !vt;
     if (vt) $('ver-perfil').href = urlPerfil(vt.id);
+}
+
+// Preenche bio, redes e vídeos (vêm do pedido de detalhes).
+function preencherDetalhes(vt) {
+    const campos = editor.elements;
+    campos.bio.value = vt?.bio ?? '';
+    REDES.forEach(rede => { campos[rede].value = vt?.redes?.[rede] ?? ''; });
+    videosEl.innerHTML = '';
+    (vt?.videos ?? []).forEach(v => adicionarVideo(
+        v.vertical ? `https://www.youtube.com/shorts/${v.id}` : `https://www.youtube.com/watch?v=${v.id}`, v.vertical));
+}
+
+function carregandoDetalhes(sim) {
+    editor.classList.toggle('loading-details', sim);
+    $('salvar').disabled = sim;
+    $('excluir').disabled = sim;
+}
+
+async function abrirEditor(id) {
+    if (id === atual && !editor.hidden) return;
+    if (!confirmarDescarte()) return;
+
+    const pedido = ++pedidoAtual;
+    atual = id;
+    imagensNovas = {};
+    idEditadoManualmente = Boolean(id);
+    alterado = false;
+    $('erro-editor').textContent = '';
+
+    const resumo = id ? vtubers.find(v => v.id === id) : null;
+    preencherResumo(resumo);
+    preencherDetalhes(null);
 
     $('nada-selecionado').hidden = true;
     editor.hidden = false;
-    editor.style.setProperty('--accent', campos.cor.value);
-    alterado = false;
-    renderLista();
-    editor.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    if (!vt) campos.nome.focus();
+    marcarSelecionada();
+    if (window.matchMedia('(max-width: 960px)').matches) {
+        editor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    if (!id) {
+        carregandoDetalhes(false);
+        editor.elements.nome.focus();
+        return;
+    }
+
+    carregandoDetalhes(true);
+    try {
+        const vt = await buscarDetalhes(id);
+        if (pedido !== pedidoAtual) return; // o usuário já clicou em outra Vtuber
+        preencherDetalhes(vt);
+    } catch (e) {
+        if (pedido !== pedidoAtual) return;
+        toast(e.message, 'erro');
+    } finally {
+        if (pedido === pedidoAtual) carregandoDetalhes(false);
+    }
 }
 
 function fecharEditor() {
+    pedidoAtual++;
     atual = null;
     editor.hidden = true;
     $('nada-selecionado').hidden = false;
-    renderLista();
+    marcarSelecionada();
 }
 
 $('cancelar').addEventListener('click', () => {
@@ -238,19 +328,38 @@ editor.addEventListener('input', event => {
 });
 
 // ---------- Imagens ----------
-function mostrarImagem(tipo, src) {
+// Mostra primeiro a miniatura (já em cache pela lista) e troca pela imagem grande quando carregar.
+function mostrarImagem(tipo, src, previa) {
     const preview = editor.querySelector(`.image-field[data-tipo="${tipo}"] .image-preview`);
     const img = preview.querySelector('img');
-    if (src) {
-        img.src = src.startsWith('data:') ? src : urlDoSite(src.replace(/^\//, ''));
-        preview.classList.add('has-image');
-    } else {
+    const final = src?.startsWith('data:') ? src : imagemUrl(src);
+
+    img.onload = null;
+    if (!final) {
         img.removeAttribute('src');
-        preview.classList.remove('has-image');
+        preview.classList.remove('has-image', 'is-loading');
+        return;
+    }
+    preview.classList.add('has-image');
+    if (previa && !src.startsWith('data:')) {
+        img.src = imagemUrl(previa);
+        preview.classList.add('is-loading');
+        const grande = new Image();
+        grande.onload = () => {
+            if (img.dataset.alvo !== final) return; // outra Vtuber já foi aberta
+            img.src = final;
+            preview.classList.remove('is-loading');
+        };
+        img.dataset.alvo = final;
+        grande.src = final;
+    } else {
+        img.dataset.alvo = final;
+        img.src = final;
+        preview.classList.remove('is-loading');
     }
 }
 
-// Reduz a imagem no navegador e converte para WEBP (mantém transparência).
+// Reduz a imagem no navegador antes do envio (o servidor gera as versões finais).
 function redimensionar(arquivo, maximo) {
     return new Promise((resolve, reject) => {
         const url = URL.createObjectURL(arquivo);
@@ -262,7 +371,7 @@ function redimensionar(arquivo, maximo) {
             canvas.height = Math.round(img.height * escala);
             canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
             URL.revokeObjectURL(url);
-            resolve(canvas.toDataURL('image/webp', 0.88));
+            resolve(canvas.toDataURL('image/webp', 0.9));
         };
         img.onerror = () => {
             URL.revokeObjectURL(url);
@@ -293,7 +402,7 @@ function adicionarVideo(url = '', vertical = false) {
     const li = document.createElement('li');
     li.className = 'video-row';
     li.innerHTML = `
-        <img class="video-thumb" alt="">
+        <img class="video-thumb" alt="" loading="lazy">
         <input type="url" placeholder="https://www.youtube.com/watch?v=..." aria-label="Link do vídeo">
         <label class="check"><input type="checkbox"> Vertical</label>
         <button type="button" class="icon-btn" title="Subir"><i class='bx bx-up-arrow-alt'></i></button>
@@ -369,6 +478,22 @@ function validarNoCliente(dados) {
     return null;
 }
 
+// Atualiza a lista local com a Vtuber salva, sem buscar tudo de novo no servidor.
+function aplicarSalvo(idAnterior, salvo) {
+    const { bio, redes, videos, ...resumo } = salvo;
+    const indice = vtubers.findIndex(v => v.id === idAnterior);
+    if (indice >= 0) vtubers[indice] = resumo;
+    else vtubers.unshift(resumo);
+    if (idAnterior) detalhes.delete(idAnterior);
+    detalhes.set(salvo.id, Promise.resolve(salvo));
+
+    const antigo = idAnterior && listaEl.querySelector(`button[data-id="${CSS.escape(idAnterior)}"]`)?.closest('li');
+    const novo = itemDaLista(resumo);
+    if (antigo) antigo.replaceWith(novo);
+    else listaEl.prepend(novo);
+    filtrarLista();
+}
+
 editor.addEventListener('submit', async event => {
     event.preventDefault();
     const dados = coletar();
@@ -376,17 +501,19 @@ editor.addEventListener('submit', async event => {
     $('erro-editor').textContent = problema || '';
     if (problema) return;
 
+    const idAnterior = atual;
     const botao = $('salvar');
     botao.disabled = true;
     botao.innerHTML = "<i class='bx bx-loader-alt bx-spin'></i>Salvando...";
     try {
-        const salvo = await chamar(atual ? `admin/vtubers?id=${encodeURIComponent(atual)}` : 'admin/vtubers', {
-            method: atual ? 'PUT' : 'POST',
+        const salvo = await chamar(idAnterior ? `admin/vtubers?id=${encodeURIComponent(idAnterior)}` : 'admin/vtubers', {
+            method: idAnterior ? 'PUT' : 'POST',
             body: JSON.stringify(dados)
         });
-        toast(atual ? 'Alterações salvas!' : 'Vtuber cadastrada!');
+        toast(idAnterior ? 'Alterações salvas!' : 'Vtuber cadastrada!');
+        aplicarSalvo(idAnterior, salvo);
         alterado = false;
-        await recarregarLista();
+        atual = null; // força reabrir com os dados salvos
         await abrirEditor(salvo.id);
     } catch (e) {
         $('erro-editor').textContent = e.message;
@@ -414,13 +541,17 @@ confirmacao.addEventListener('input', () => {
 });
 
 modal.addEventListener('close', async () => {
-    if (modal.returnValue !== 'confirmar' || confirmacao.value.trim() !== atual) return;
+    const id = atual;
+    if (modal.returnValue !== 'confirmar' || confirmacao.value.trim() !== id) return;
     try {
-        await chamar(`admin/vtubers?id=${encodeURIComponent(atual)}`, { method: 'DELETE' });
+        await chamar(`admin/vtubers?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
         toast('Vtuber excluída.');
+        vtubers = vtubers.filter(v => v.id !== id);
+        detalhes.delete(id);
+        listaEl.querySelector(`button[data-id="${CSS.escape(id)}"]`)?.closest('li').remove();
         alterado = false;
         fecharEditor();
-        await recarregarLista();
+        filtrarLista();
     } catch (e) {
         toast(e.message, 'erro');
     }

@@ -13,11 +13,15 @@ async function dataUrl(caminho) {
     return `data:${mime};base64,${dados.toString('base64')}`;
 }
 
-export async function semear({ log = console.log } = {}) {
+export async function aplicarSchema() {
     const schema = await readFile(new URL('db/schema.sql', raiz), 'utf8');
     for (const comando of schema.split(/;\s*$/m).map(c => c.trim()).filter(Boolean)) {
         await sql(comando);
     }
+}
+
+export async function semear({ log = console.log } = {}) {
+    await aplicarSchema();
 
     const seed = JSON.parse(await readFile(new URL('db/seed.json', raiz), 'utf8'));
     let criadas = 0;

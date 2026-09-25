@@ -92,7 +92,8 @@ Em `/admin`, depois de entrar com a senha, você pode:
 - **Editar** qualquer campo, inclusive trocar imagens e reordenar vídeos;
 - **Excluir**, confirmando ao digitar o identificador da VTuber.
 
-As imagens são reduzidas e convertidas para WEBP no navegador antes de ir para o banco. Na bio, separe
+O servidor converte cada imagem enviada para WEBP em três tamanhos: card (lista), miniatura (lista do painel) e perfil.
+Se houver imagens antigas no banco em outro formato, rode `npm run otimizar-imagens` para convertê-las. Na bio, separe
 parágrafos com uma linha em branco, use `**texto**` para negrito e `==texto==` para destacar na cor da VTuber.
 Alterações aparecem no site em até 1 minuto (cache da CDN).
 

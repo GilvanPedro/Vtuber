@@ -1699,6 +1699,29 @@ code {
     display: none;
 }
 
+.image-preview.is-loading img {
+    filter: blur(6px);
+    transform: scale(1.04);
+}
+
+.image-preview img {
+    transition: filter 0.25s;
+}
+
+/* Enquanto bio, redes e vídeos carregam */
+.editor.loading-details textarea,
+.editor.loading-details input[type="url"] {
+    color: transparent;
+    background: linear-gradient(90deg, var(--bg-soft), var(--surface-2), var(--bg-soft));
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+    pointer-events: none;
+}
+
+.editor.loading-details #add-video {
+    visibility: hidden;
+}
+
 .image-field label.btn {
     cursor: pointer;
 }

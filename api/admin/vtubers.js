@@ -7,7 +7,9 @@
 import { json, erro, rota } from '../../lib/http.js';
 import { autenticado } from '../../lib/auth.js';
 import { validarVtuber } from '../../lib/validar.js';
-import { listarVtubers, buscarVtuber, existe, criarVtuber, atualizarVtuber, excluirVtuber } from '../../lib/vtubers.js';
+import {
+    listarVtubers, buscarVtuber, criarVtuber, atualizarVtuber, excluirVtuber, ErroConflito, ErroNaoEncontrado
+} from '../../lib/vtubers.js';
 
 const SEM_CACHE = { 'Cache-Control': 'no-store' };
 
@@ -18,7 +20,13 @@ const protegida = handler => rota(async request => {
     if (request.method !== 'GET' && origem && origem !== new URL(request.url).origin) {
         return erro('Origem não permitida.', 403);
     }
-    return handler(request, new URL(request.url).searchParams.get('id'));
+    try {
+        return await handler(request, new URL(request.url).searchParams.get('id'));
+    } catch (e) {
+        if (e instanceof ErroConflito) return erro(e.message, 409);
+        if (e instanceof ErroNaoEncontrado) return erro(e.message, 404);
+        throw e;
+    }
 });
 
 export const GET = protegida(async (request, id) => {
@@ -29,20 +37,14 @@ export const GET = protegida(async (request, id) => {
 
 export const POST = protegida(async request => {
     const vt = validarVtuber(await request.json().catch(() => null));
-    if (await existe(vt.id)) return erro(`Já existe uma vtuber com o identificador "${vt.id}".`, 409);
     if (!vt.imagens.card) return erro('Envie a imagem do card.', 400);
-    await criarVtuber(vt);
-    return json(await buscarVtuber(vt.id), 201, SEM_CACHE);
+    return json(await criarVtuber(vt), 201, SEM_CACHE);
 });
 
 export const PUT = protegida(async (request, id) => {
-    if (!id || !(await existe(id))) return erro('Vtuber não encontrada.', 404);
+    if (!id) return erro('Vtuber não encontrada.', 404);
     const vt = validarVtuber(await request.json().catch(() => null));
-    if (vt.id !== id && await existe(vt.id)) {
-        return erro(`Já existe uma vtuber com o identificador "${vt.id}".`, 409);
-    }
-    await atualizarVtuber(id, vt);
-    return json(await buscarVtuber(vt.id), 200, SEM_CACHE);
+    return json(await atualizarVtuber(id, vt), 200, SEM_CACHE);
 });
 
 export const DELETE = protegida(async (request, id) => {

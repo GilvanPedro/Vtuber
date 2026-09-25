@@ -14,12 +14,16 @@ CREATE TABLE IF NOT EXISTS vtubers (
     atualizado_em TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Imagens de cada vtuber: 'card' (lista/home) e 'perfil' (página da vtuber)
+-- Imagens de cada vtuber (WEBP): 'card' (lista/home), 'mini' (lista do admin) e 'perfil' (página da vtuber)
 CREATE TABLE IF NOT EXISTS imagens (
     vtuber_id     TEXT NOT NULL REFERENCES vtubers(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    tipo          TEXT NOT NULL CHECK (tipo IN ('card', 'perfil')),
+    tipo          TEXT NOT NULL,
     mime          TEXT NOT NULL,
     dados         BYTEA NOT NULL,
     atualizado_em TIMESTAMPTZ NOT NULL DEFAULT now(),
     PRIMARY KEY (vtuber_id, tipo)
 );
+
+-- Tipos de imagem aceitos (recriada para bancos criados antes do tipo 'mini')
+ALTER TABLE imagens DROP CONSTRAINT IF EXISTS imagens_tipo_check;
+ALTER TABLE imagens ADD CONSTRAINT imagens_tipo_check CHECK (tipo IN ('card', 'mini', 'perfil'));
