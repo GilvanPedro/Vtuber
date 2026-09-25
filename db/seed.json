@@ -1,0 +1,560 @@
+[
+  {
+    "id": "nyhzumi",
+    "nome": "Nyhzumi",
+    "cor": "#00ffff",
+    "tags": [
+      "asmr",
+      "gameplay",
+      "just-chatting",
+      "react"
+    ],
+    "horario": [
+      "tarde",
+      "noite"
+    ],
+    "plataforma": [
+      "twitch"
+    ],
+    "idioma": [
+      "portugues",
+      "ingles"
+    ],
+    "bio": "==Nyhzumi== é uma VTuber brasileira que cria conteúdo em **português e inglês**, conhecida por seu humor peculiar e habilidade questionável em jogos.\n\nSua personagem é uma híbrida de **lobo-demônio**, frequentemente descrita como hiperativa e travessa, mas também ingênua e tímida em relação ao mundo humano. De acordo com sua história, ela foi encontrada em uma floresta por um humano e, após ser alimentada, recusou-se a partir, tornando-se seu **\"animal de estimação\"**. Agora, ela faz transmissões ao vivo para pagar pelos danos que causa.\n\nNyhzumi estreou como VTuber em 31 de outubro de 2021 e, desde então, tem ganhado popularidade na comunidade de VTubers. **Ela realiza transmissões ao vivo na Twitch a partir das 18h**, onde interage com seus seguidores e joga diversos títulos.",
+    "redes": {
+      "twitch": "https://www.twitch.tv/nyhzumi",
+      "youtube": "https://www.youtube.com/@nyhzumi",
+      "x": "https://x.com/nyhzumi"
+    },
+    "videos": [
+      {
+        "id": "HwjvyrESF9E",
+        "vertical": false
+      }
+    ],
+    "imagem_card": "img/nyhzumi/nyhzumi1.png",
+    "imagem_perfil": "img/nyhzumi/nyhzumi2.jpg",
+    "ordem": 16
+  },
+  {
+    "id": "inaishi",
+    "nome": "Inaishi",
+    "cor": "#d096ed",
+    "tags": [
+      "just-chatting",
+      "gameplay"
+    ],
+    "horario": [
+      "tarde"
+    ],
+    "plataforma": [
+      "twitch"
+    ],
+    "idioma": [
+      "portugues"
+    ],
+    "bio": "==Inaishi== é uma VTuber independente carioca que começou a se destacar **na cena brasileira com seu carisma e versatilidade.** Seu canal na Twitch, com cerca de 2.600 seguidores, mistura gameplays, sessões artísticas — como desenho e pintura digital — e momentos descontraídos com o público, criando um ambiente acolhedor e participativo para sua comunidade.\n\nCom modelo 3D de visual suave — **geralmente com cabelos claros, traços delicados e um estilo “kawaii”** — ela mescla charme e autenticidade. Inaishi tem agendada transmissões frequentes chamadas **“Jogatina noturna” ou “Cafézinho”** que atraem seguidores que apreciam tanto a criatividade quanto o conforto de suas interações.\n\nAlém **da Twitch, ela expande sua presença no YouTube, com cerca de 290 inscritos, onde publica highlights de lives, tutoriais de arte e gameplays.** Seu conteúdo artístico ao vivo atrai muitos aspirantes a ilustradores, pois ela compartilha dicas, mostra seu processo criativo e interage diretamente, tornando as lives uma experiência educativa e divertida.\n\nInaishi também é ativa em outras redes, promovendo arte e momentos da sua rotina criativa. Essa proximidade auxilia na fidelização da comunidade e reforça seu vínculo com fãs, que acompanham tanto as lives quanto os bastidores do desenvolvimento de seu avatar e produções.",
+    "redes": {
+      "twitch": "https://www.twitch.tv/inaishi",
+      "youtube": "https://www.youtube.com/@Inaishi",
+      "x": "https://x.com/inaishi_"
+    },
+    "videos": [
+      {
+        "id": "MBTwqKyChd0",
+        "vertical": false
+      }
+    ],
+    "imagem_card": "img/Inaishi/Inaishi1.png",
+    "imagem_perfil": "img/Inaishi/inaishi3.png",
+    "ordem": 15
+  },
+  {
+    "id": "ravielkarim",
+    "nome": "Raviel Karim",
+    "cor": "#ce730c",
+    "tags": [
+      "just-chatting",
+      "gameplay",
+      "react",
+      "musica"
+    ],
+    "horario": [
+      "tarde",
+      "noite"
+    ],
+    "plataforma": [
+      "youtube"
+    ],
+    "idioma": [
+      "portugues"
+    ],
+    "bio": "==Raviel Karim==, também conhecido como **Ravi, é um VTuber brasileiro que ganhou destaque como membro da segunda geração da agência NEOBAKA**, conhecida como \"Os Destinados\". Ele é reconhecido por sua personalidade enérgica, carisma contagiante e uma narrativa envolvente que mistura elementos de aventura e mitologia egípcia. O visual de Raviel é **inspirado na estética egípcia, com cabelos pretos bagunçados, olhos dourados e detalhes em dourado em suas roupas e acessórios. **\n\nNa narrativa de seu personagem, ==Raviel== é um explorador que, durante uma expedição a uma tumba egípcia, encontrou um colar dourado protegido por Anúbis. Ao tentar pegar o artefato, ativou uma armadilha mortal. No entanto, **fez um pacto com o guardião da relíquia, permitindo-lhe retornar à vida com a condição de nunca remover o colar**. Esse acordo o conecta espiritualmente a um chacal, que se manifesta em seu modelo com orelhas e traços dourados, simbolizando sua ligação com o mundo espiritual.\n\nRaviel iniciou sua **carreira como VTuber em 26 de novembro de 2023**, estreando com mais de 12 mil espectadores simultâneos. Seu canal no YouTube rapidamente cresceu, alcançando 100 mil inscritos em apenas 61 dias, tornando-se um dos VTubers brasileiros de crescimento mais rápido.\n\nSeu conteúdo é diversificado, incluindo gameplays, interações com o público e vídeos editados com humor e criatividade. Ele realiza transmissões ao vivo em seu canal principal no YouTube e compartilha clipes e vídeos curtos no TikTok. **Seus conteúdos incluem gameplays de jogos de aventura e terror, interações com o público e colaborações com outros membros da NEOBAKA.**",
+    "redes": {
+      "twitch": "https://www.twitch.tv/ravielkarim",
+      "youtube": "https://www.youtube.com/@RavielKarim/featured",
+      "x": "https://x.com/ravielkarim"
+    },
+    "videos": [
+      {
+        "id": "tF6eCxlblQk",
+        "vertical": false
+      }
+    ],
+    "imagem_card": "img/ravielkarim/ravielkarim1.png",
+    "imagem_perfil": "img/ravielkarim/ravielkarim2.png",
+    "ordem": 14
+  },
+  {
+    "id": "dantewill",
+    "nome": "DanteWill",
+    "cor": "#8f4ae0",
+    "tags": [
+      "just-chatting",
+      "gameplay",
+      "react"
+    ],
+    "horario": [
+      "noite"
+    ],
+    "plataforma": [
+      "youtube"
+    ],
+    "idioma": [
+      "portugues"
+    ],
+    "bio": "==DanteWill==, também conhecido como **Danaramor, é um VTuber brasileiro e cofundador da agência NEOBAKA**. Desde sua estreia em 8 de dezembro de 2021, ele se destacou na comunidade de VTubers do Brasil com uma abordagem criativa que combina narrativa envolvente, múltiplas personas e conteúdo diversificado.\n\nDanteWill interpreta Danaramor, **um híbrido de morcego e aranha com 2.500 anos,** designado como o protetor da Yggdrasil, a grande árvore que conecta todos os universos. Ele guarda a chave que abre todas as portas dimensionais, garantindo que essas passagens não sejam usadas indevidamente.\n\nDanteWill produz uma variedade de conteúdos, incluindo **gameplays, reações, discussões sobre animes e músicas.** Ele é conhecido por suas transmissões ao vivo no YouTube, onde interage com o público e compartilha suas experiências em jogos como Genshin Impact e Roblox.\n\nDanteWill possui diversos modelos e skins que refletem sua versatilidade e criatividade: **Modelos 2D e 3D:** Incluindo versões chibi, humanoides e temáticas como maid, mordomo e idol. **Skins de Eventos:** NEOSPOOKY, NEOCHRISTMAS, NEOSUMMER, entre outras. **Modelos Especiais:** Como o modo aranha e o modo morcego, cada um com características únicas.",
+    "redes": {
+      "twitch": "https://www.twitch.tv/dante_will",
+      "youtube": "https://www.youtube.com/@dantewill",
+      "x": "https://x.com/thedantewill"
+    },
+    "videos": [
+      {
+        "id": "72r0XJhWzts",
+        "vertical": false
+      }
+    ],
+    "imagem_card": "img/dantewill/dantewill1.png",
+    "imagem_perfil": "img/dantewill/dantewill2.png",
+    "ordem": 13
+  },
+  {
+    "id": "hiniinha",
+    "nome": "Hiniinha",
+    "cor": "#d428ff",
+    "tags": [
+      "just-chatting",
+      "gameplay",
+      "react"
+    ],
+    "horario": [
+      "tarde",
+      "noite"
+    ],
+    "plataforma": [
+      "youtube"
+    ],
+    "idioma": [
+      "portugues"
+    ],
+    "bio": "==Hininha== é uma VTuber brasileira que se destaca no **cenário indie por seu carisma, autenticidade e dedicação à comunidade.** Ela iniciou sua jornada como PNGTuber e, posteriormente, evoluiu para o formato Live2D, criando uma identidade visual única que a conecta profundamente com seus seguidores.\n\nSeu conteúdo é diversificado, abrangendo desde gameplays de títulos como VALORANT até sessões de \"Just Chatting\", **onde compartilha experiências pessoais, interage com o chat e promove um ambiente acolhedor.** A interação genuína com seus espectadores é uma das marcas registradas de Hininha, fortalecendo o senso de comunidade em seu canal.\n\nAlém das transmissões, Hininha também compartilha momentos do seu dia a dia e reflexões pessoais, proporcionando aos fãs uma visão mais íntima de sua vida. Essa transparência e proximidade com o público são aspectos que a tornam uma figura querida e respeitada na comunidade VTuber brasileira.\n\nSe você está em busca de uma VTuber que combina entretenimento de qualidade com uma conexão real com seus seguidores, Hininha é uma excelente escolha para acompanhar.",
+    "redes": {
+      "twitch": "https://www.twitch.tv/hiininha",
+      "youtube": "https://www.youtube.com/@hiininha/featured",
+      "x": "https://x.com/Hiniinha"
+    },
+    "videos": [
+      {
+        "id": "4BK_gKP62jk",
+        "vertical": false
+      }
+    ],
+    "imagem_card": "img/hiniinha/hiniinha1.png",
+    "imagem_perfil": "img/hiniinha/hiniinha2.png",
+    "ordem": 12
+  },
+  {
+    "id": "toshiruz",
+    "nome": "Toshiruz",
+    "cor": "#ef0909",
+    "tags": [
+      "just-chatting",
+      "gameplay",
+      "react"
+    ],
+    "horario": [
+      "tarde",
+      "noite"
+    ],
+    "plataforma": [
+      "twitch",
+      "youtube"
+    ],
+    "idioma": [
+      "portugues",
+      "ingles"
+    ],
+    "bio": "==Toshiruz==, também conhecido como **Toshi ou Tozi, é um dos principais nomes da cena de VTubers no Brasil.** Com uma abordagem criativa e envolvente, ele conquistou uma ampla audiência através de suas transmissões ao vivo, vídeos editados e presença nas redes sociais.\n\nToshiruz interpreta um personagem **meio-humano, meio-oni, que viaja no tempo para evitar uma catástrofe em sua linha temporal.** Ele lidera o grupo Guren, composto por indivíduos com **habilidades especiais,** com o objetivo de impedir que eventos trágicos se repitam.\n\nToshiruz iniciou sua carreira como ==VTuber em 2020==, utilizando um modelo 3D criado no VRoid Studio. **Em 2022, estreou seu modelo 2D** e foi um dos fundadores da ex agência NEOBAKA, onde colaborou com outros criadores como **DanteWill, Eeiris Zuro e SissiKawaii**.\n\nSeu conteúdo é diversificado, incluindo gameplays, interações com o público e vídeos editados com humor e criatividade. Ele realiza transmissões ao vivo em seu canal principal no YouTube e compartilha clipes e vídeos curtos no TikTok.",
+    "redes": {
+      "twitch": "https://www.twitch.tv/toshiruz",
+      "youtube": "https://www.youtube.com/@toshiruzlives",
+      "x": "https://x.com/toshiruz"
+    },
+    "videos": [
+      {
+        "id": "riTTQyF-RTs",
+        "vertical": false
+      }
+    ],
+    "imagem_card": "img/toshiruz/toshiruz1.png",
+    "imagem_perfil": "img/toshiruz/toshiruz2.png",
+    "ordem": 11
+  },
+  {
+    "id": "squchan",
+    "nome": "SquChan",
+    "cor": "#9b2efa",
+    "tags": [
+      "asmr",
+      "just-chatting",
+      "gameplay",
+      "react",
+      "arte"
+    ],
+    "horario": [
+      "tarde",
+      "noite"
+    ],
+    "plataforma": [
+      "twitch"
+    ],
+    "idioma": [
+      "ingles"
+    ],
+    "bio": "==SquChan== é uma ilustradora freelance e VTuber independente. Ela começou a transmitir na Twitch em **15 de junho de 2020** e fez sua estreia com modelo virtual em 13 de fevereiro de 2021.\n\nComo artista, SquChan é conhecida por seu estilo de ilustração inspirado em anime e design de personagens. Ela contribuiu com artes para as histórias secundárias do jogo **\"Doki Doki Literature Club Plus\"**.\n\nNas streams, SquChan compartilha seu processo criativo, joga diversos títulos e interage com seu público. Ela é conhecida por seu **carisma** e pela capacidade de concluir rapidamente suas ilustrações. Além de sua presença na Twitch, ela mantém um canal no YouTube.",
+    "redes": {
+      "twitch": "https://www.twitch.tv/squchan",
+      "youtube": "https://www.youtube.com/@SquChanVT",
+      "x": "https://x.com/SquChanVT"
+    },
+    "videos": [
+      {
+        "id": "P90F2pjB_o4",
+        "vertical": false
+      }
+    ],
+    "imagem_card": "img/squchan/squchan1.png",
+    "imagem_perfil": "img/squchan/squchan2.png",
+    "ordem": 10
+  },
+  {
+    "id": "akariinyan",
+    "nome": "Akariinyan",
+    "cor": "#ef0909",
+    "tags": [
+      "just-chatting",
+      "gameplay",
+      "react",
+      "musica"
+    ],
+    "horario": [
+      "tarde",
+      "noite"
+    ],
+    "plataforma": [
+      "twitch",
+      "youtube"
+    ],
+    "idioma": [
+      "portugues"
+    ],
+    "bio": "==AkariiNyan== é uma VTuber brasileira que se apresenta como uma gata virtual, realizando transmissões ao vivo quase todas as noites às 20h. Ela é conhecida por seu conteúdo diversificado, que inclui **interações com o público, gameplays e discussões sobre diversos temas.**\n\nAlém disso, ela mantém um canal no YouTube, onde compartilha vídeos de suas transmissões e outros conteúdos relacionados.",
+    "redes": {
+      "twitch": "https://www.twitch.tv/akariinyan",
+      "youtube": "https://www.youtube.com/@AkariiNyan",
+      "x": "https://x.com/akariinyan"
+    },
+    "videos": [
+      {
+        "id": "7HeThdqCEfQ",
+        "vertical": false
+      }
+    ],
+    "imagem_card": "img/akariinyan/akariinyan1.png",
+    "imagem_perfil": "img/akariinyan/akariinyan2.png",
+    "ordem": 9
+  },
+  {
+    "id": "gigimurin",
+    "nome": "Gigi Murin",
+    "cor": "#ff8400",
+    "tags": [
+      "just-chatting",
+      "gameplay",
+      "musica"
+    ],
+    "horario": [
+      "noite",
+      "madrugada"
+    ],
+    "plataforma": [
+      "youtube"
+    ],
+    "idioma": [
+      "ingles"
+    ],
+    "bio": "==Gigi Murim== é uma VTuber da hololive English, integrante da **quarta geração intitulada -Justice-**, ao lado de Elizabeth Rose Bloodflame, Cecilia Immergreen e Raora Panthera. Ela estreou em 22 de junho de 2024 e rapidamente conquistou fãs com sua personalidade caótica e carismática.​\n\nGigi é descrita como uma **\"gremlin\" energética, barulhenta e imprevisível**. Ela é obcecada por memes e frequentemente faz piadas ousadas, sempre buscando divertir seus espectadores. Apesar de seu comportamento ==caótico==, ela demonstra um lado gentil e é dedicada aos seus fãs, conhecidos como \"Grems\".\n\nDesde sua estreia, Gigi alcançou marcos significativos, como 200.000 inscritos em junho de 2024 e 400.000 em fevereiro de 2025. Ela participou de projetos como **\"ENigmatic Recollection\" e colaborou com a Capcom em uma parceria relacionada a Monster Hunter Wilds.**",
+    "redes": {
+      "youtube": "https://www.youtube.com/@holoen_gigimurin",
+      "x": "https://x.com/gigimurin"
+    },
+    "videos": [
+      {
+        "id": "m-iqhQFwUyU",
+        "vertical": false
+      }
+    ],
+    "imagem_card": "img/gigimurin/gigi1.png",
+    "imagem_perfil": "img/gigimurin/gigi2.png",
+    "ordem": 8
+  },
+  {
+    "id": "mayuyu",
+    "nome": "Mayuyu",
+    "cor": "#ff9afb",
+    "tags": [
+      "just-chatting",
+      "gameplay",
+      "react"
+    ],
+    "horario": [
+      "tarde"
+    ],
+    "plataforma": [
+      "twitch",
+      "youtube"
+    ],
+    "idioma": [
+      "portugues"
+    ],
+    "bio": "==MayuyuVT== é uma VTuber brasileira que combina o charme da “maid súcubo” com interações calorosas e acolhedoras, estabelecendo um estilo único no cenário. Com lives frequentes, presença em grupo colaborativo e uma comunidade engajada, **ela segue fiel ao seu formato de “café com companhia”, conquistando diversão,** leveza e conforto ao longo de sua jornada.\n\nO ponto central são as sessões em categoria Just Chatting, onde ela conversa enquanto serve seu “café virtual”\n\nTambém inclui **gameplays variados, incluindo temas populares** como “roleta buckshot” e desafios, e jogos como Frostpunk 2, Alan Wake II, “Atomic Heart” e Euro Truck Simulator II",
+    "redes": {
+      "twitch": "https://www.twitch.tv/mayuyuvt?lang=pt-br",
+      "youtube": "https://www.youtube.com/@MayuyuVT",
+      "x": "https://x.com/MayuyuVT?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor"
+    },
+    "videos": [
+      {
+        "id": "iO8OEVBYEGc",
+        "vertical": false
+      }
+    ],
+    "imagem_card": "img/mayuyu/mayuyu1.png",
+    "imagem_perfil": "img/mayuyu/mayuyu2.png",
+    "ordem": 7
+  },
+  {
+    "id": "vamppychan",
+    "nome": "VamppyChan",
+    "cor": "#9a4fe0",
+    "tags": [
+      "just-chatting",
+      "gameplay"
+    ],
+    "horario": [
+      "tarde"
+    ],
+    "plataforma": [
+      "twitch",
+      "youtube"
+    ],
+    "idioma": [
+      "portugues"
+    ],
+    "bio": "==VamppyChan== é uma criadora de conteúdo brasileira que atua como VTuber no Twitch, trazendo uma estética encantadora de vampira com uma personalidade carismática e brincalhona. Desde que **iniciou suas transmissões em 2020, ela vem conquistando um público fiel que se identifica com seu estilo** descontraído e acolhedor. A personagem que interpreta, uma vampira divertida e muitas vezes caótica, se tornou símbolo de suas transmissões animadas, recheadas de momentos engraçados, fofura espontânea e um toque de maluquice saudável.\n\n**Participou de eventos de Minecraft RP’s (MSMP) e VRChat, onde convidou os fãs com frases como “Vem dançar comigo” no Just Dance**. Seus clipes variam de humor (“Arroto mais monstruoso…”) a momentos fofos, ressalvando sua versatilidade no conteúdo\n\nSeu canal cresceu ao longo dos anos e ela se tornou parceira oficial da Twitch, reunindo milhares de seguidores. Com transmissões frequentes que giram entre jogos como ** Minecraft, VRChat e sessões de “Just Chatting”**, Vamppy cria um ambiente onde os espectadores se sentem parte de uma verdadeira comunidade, chamada carinhosamente de “Vampetas”. Além dos jogos, seus momentos mais icônicos envolvem situações inesperadas, reações exageradas, arroto em live, e até declarações do tipo “Vamppy, sua namorada vampdere!”, tudo isso com muito bom humor e espontaneidade.\n\nCom sua autenticidade e carisma, VamppyChan se **destaca como uma das VTubers brasileiras mais queridas em seu nicho**. Sua trajetória é marcada pelo crescimento constante e pela construção de um espaço seguro e divertido para fãs de todas as idades que buscam rir, relaxar e compartilhar boas histórias com uma vampira virtual que joga e dança.",
+    "redes": {
+      "twitch": "https://www.twitch.tv/vamppychan?lang=pt",
+      "youtube": "https://www.youtube.com/vamppychan",
+      "x": "https://x.com/vamppychan?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor"
+    },
+    "videos": [
+      {
+        "id": "1GgjxlG_vOE",
+        "vertical": false
+      }
+    ],
+    "imagem_card": "img/vamppychan/vamppychan1.png",
+    "imagem_perfil": "img/vamppychan/vamppychan2.png",
+    "ordem": 6
+  },
+  {
+    "id": "calamarei",
+    "nome": "Calamarei",
+    "cor": "#a6a6a6",
+    "tags": [
+      "just-chatting",
+      "gameplay"
+    ],
+    "horario": [
+      "tarde"
+    ],
+    "plataforma": [
+      "twitch"
+    ],
+    "idioma": [
+      "ingles"
+    ],
+    "bio": "==Calamarei==, também conhecida como Cala Marina, é uma VTuber **independente com uma identidade única e fascinante.** Com visual que combina traços de lula/vampira — longos tentáculos cor-de-rosa como cabelo, pele bronzeada e olhos dourados — ela se apresenta como a \"squid vamp\" mais maligna e divertida dos oceanos.\n\nEla começou suas atividades no Twitch em março de 2023 como uma PNGTuber, revelando seu lado artístico antes mesmo de estrear oficialmente com modelagem Live2D em outubro do mesmo ano, após um subathon para financiar sua arte. **Desde então, Calamarei se dedica a streams de horror, arte, jogos como Beat Saber e momentos de pura descontração. Ela também criou o projeto “Ice Breakers”, voltado a incentivar colaborações entre indie VTubers** — um espaço seguro para conectar criadores dentro de jogos multiplayer.\n\n**Com sua mistura de terror, arte, colaboratividade e presença criativa, Calamarei se firma como uma figura influente no cenário indie VTuber,** mostrando que identidade visual forte e iniciativas comunitárias podem gerar grandes impactos — e conquistar os corações de fãs que gostam de um toque de malícia oceânica.",
+    "redes": {
+      "twitch": "https://www.twitch.tv/calamareivt",
+      "youtube": "https://www.youtube.com/@calamarei",
+      "x": "https://x.com/calamareivt"
+    },
+    "videos": [
+      {
+        "id": "25saTcLvt2E",
+        "vertical": true
+      }
+    ],
+    "imagem_card": "img/calamarei/Calamarei1.png",
+    "imagem_perfil": "img/calamarei/calamarei2.png",
+    "ordem": 5
+  },
+  {
+    "id": "milkymew",
+    "nome": "Milky Mew",
+    "cor": "#0096db",
+    "tags": [
+      "just-chatting",
+      "gameplay",
+      "react"
+    ],
+    "horario": [
+      "manha"
+    ],
+    "plataforma": [
+      "twitch"
+    ],
+    "idioma": [
+      "ingles",
+      "portugues"
+    ],
+    "bio": "==MilkyMew== (também conhecida como MilkyMew ou apenas Mew) é uma VTuber independente de **dupla nacionalidade — brasileira e japonesa — que transmite majoritariamente em inglês,** criando um ambiente acolhedor e divertido com tema de maid e catgirl.\n\nEla estreou em 9 de novembro de 2020 no Twitch e **rapidamente conquistou o status de parceira.** Seu canal já possui aproximadamente 18.800 seguidores, com ela obtendo cada vez mais reconhecimento.\n\nO conteúdo que produz é variado, incluindo cenas de gameplay (como Elden Ring, Zenless Zone Zero e Hades), sessões de “Just Chatting” e reações a vídeos. **É comum encontrá-la interagindo com o chat, fazendo “maideny” expressões ou reações divertidas** — tudo dentro de um tom leve e acolhedor de maid-catgirl.\n\nCom seu carisma cativante, estatísticas impressionantes e perfil fofa-catgirl, Milky Mew se destaca no cenário indie de VTubers como uma streamer internacional que equilibra qualidade, simpatia e engajamento real.",
+    "redes": {
+      "twitch": "https://www.twitch.tv/milkymew",
+      "youtube": "https://www.youtube.com/@MilkyMew_",
+      "x": "https://x.com/milkymew_"
+    },
+    "videos": [
+      {
+        "id": "5SR0YIDOklw",
+        "vertical": false
+      }
+    ],
+    "imagem_card": "img/milkymew/milkymew1.png",
+    "imagem_perfil": "img/milkymew/milkymew2.png",
+    "ordem": 4
+  },
+  {
+    "id": "eeiris",
+    "nome": "Eeiris",
+    "cor": "#3a63f0",
+    "tags": [
+      "just-chatting",
+      "gameplay",
+      "react"
+    ],
+    "horario": [
+      "tarde"
+    ],
+    "plataforma": [
+      "youtube"
+    ],
+    "idioma": [
+      "portugues"
+    ],
+    "bio": "==EeirisZuro==, conhecida como **Eeiris ou Eres**, é uma VTuber brasileira e uma das fundadoras da agência NEOBAKA. Como membro da primeira geração, intitulada \"Os Viajantes\", ela compartilha essa posição com Toshiruz e DanteWill. Sua presença cativante e conteúdo diversificado a tornaram uma figura influente na comunidade VTuber do Brasil.\n\nEeiris é uma ==Kitsune interdimensional== que, após inúmeras viagens por diferentes realidades, **perdeu suas memórias devido à sobrecarga de experiências incompreensíveis para a mente humana**. Apesar disso, ela mantém uma atitude positiva, focando no presente e buscando descobrir seu propósito neste mundo. Sua narrativa é marcada por elementos místicos e uma conexão profunda com o desconhecido.\n\n**Desde sua estreia em 2022, Eeiris produz uma variedade de conteúdos, incluindo gameplays, reações e interações com o público.** Seus jogos favoritos incluem \"Little Nightmares\", \"Doki Doki Literature Club\", \"Minecraft\" e \"Mandela Catalogue\". Ela também realiza transmissões ao vivo focadas em \"Ordem Paranormal\", um RPG de mesa brasileiro.",
+    "redes": {
+      "twitch": "https://www.twitch.tv/eeiris",
+      "youtube": "https://www.youtube.com/@Eeiris/videos",
+      "x": "https://x.com/Eeirisz"
+    },
+    "videos": [
+      {
+        "id": "h6YG6yI8jnI",
+        "vertical": false
+      }
+    ],
+    "imagem_card": "img/eeiris/eeiris2.png",
+    "imagem_perfil": "img/eeiris/eeiris2.png",
+    "ordem": 3
+  },
+  {
+    "id": "nixi",
+    "nome": "Nixi",
+    "cor": "#c41d1d",
+    "tags": [
+      "asmr",
+      "gameplay"
+    ],
+    "horario": [
+      "tarde",
+      "noite"
+    ],
+    "plataforma": [
+      "twitch"
+    ],
+    "idioma": [
+      "ingles"
+    ],
+    "bio": "==Nixi== é uma VTuber e criadora de conteúdo especializada em ASMR, reconhecida por sua abordagem única e envolvente. Com uma estética que mistura elementos de vampira e sensualidade, ela conquistou uma base de fãs dedicada nas plataformas Twitch e YouTube.\n\nNixi é conhecida por suas **transmissões de ASMR em inglês, com conteúdo voltado para um público adulto.** Suas sessões incluem uma variedade de \"gatilhos\" auditivos, como sussurros suaves, sons binaurais e interações que visam proporcionar relaxamento e conforto aos espectadores. Além disso, ela utiliza equipamentos de alta qualidade, como o microfone 3Dio, para criar uma experiência auditiva imersiva.\n\nA personagem de Nixi **é uma vampira com uma personalidade cativante e brincalhona.** Ela frequentemente interage com seu público de maneira íntima e acolhedora, utilizando expressões como \"Your Royal Thighness, Countess Crushula\" para adicionar um toque de humor e charme às suas transmissões.",
+    "redes": {
+      "twitch": "https://www.twitch.tv/nixi",
+      "youtube": "https://www.youtube.com/c/NixiTheVampy"
+    },
+    "videos": [
+      {
+        "id": "LZzOnnFebuM",
+        "vertical": true
+      }
+    ],
+    "imagem_card": "img/nixi/nixi1.png",
+    "imagem_perfil": "img/nixi/nixi2.png",
+    "ordem": 2
+  },
+  {
+    "id": "naokonn",
+    "nome": "Naokonn",
+    "cor": "#ffeabe",
+    "tags": [
+      "just-chatting",
+      "gameplay"
+    ],
+    "horario": [
+      "noite"
+    ],
+    "plataforma": [
+      "twitch"
+    ],
+    "idioma": [
+      "ingles",
+      "portugues"
+    ],
+    "bio": "==Naokonn== é uma VTuber brasileira que se destaca no cenário de ASMR na Twitch. Ela **iniciou sua jornada como criadora de conteúdo em 2024, com foco em proporcionar experiências sensoriais relaxantes e imersivas para seu público.**\n\nSeu conteúdo é caracterizado por uma atmosfera acolhedora e tranquila. Além disso, Naokonn também compartilha **momentos de sua vida cotidiana e interage de forma genuína com seus seguidores, criando uma comunidade engajada e acolhedora.**\n\nEmbora informações detalhadas sobre sua biografia ainda sejam limitadas, é possível acompanhar suas transmissões ao vivo e interações nas redes sociais para conhecer mais sobre seu trabalho e personalidade.",
+    "redes": {
+      "twitch": "https://www.twitch.tv/naokonn",
+      "youtube": "https://www.youtube.com/@naokonlives",
+      "x": "https://x.com/naookon"
+    },
+    "videos": [
+      {
+        "id": "Wf3tDpxNmhk",
+        "vertical": false
+      }
+    ],
+    "imagem_card": "img/naokonn/naokonn1.png",
+    "imagem_perfil": "img/naokonn/naokonn2.png",
+    "ordem": 1
+  }
+]

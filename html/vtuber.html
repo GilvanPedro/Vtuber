@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vtuber · Vtuber Search</title>
+    <meta name="description" content="Bio, horários, plataformas, vídeos e redes sociais da Vtuber.">
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="shortcut icon" href="../img/Logo Vtuber Search.png" type="image/x-icon">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container">
+            <a href="../index.html" class="logo">
+                <img src="../img/Logo Vtuber Search.png" alt="">
+                <span class="gradient-text">Vtuber Search</span>
+            </a>
+            <nav class="nav" id="nav" aria-label="Principal">
+                <a href="../index.html">Home</a>
+                <a href="./vtubers.html" aria-current="page">Vtubers</a>
+                <a href="./about.html">Sobre</a>
+            </nav>
+            <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <main id="perfil">
+        <section class="profile-hero">
+            <div class="container">
+                <div class="profile-art is-loading"></div>
+                <div>
+                    <span class="skeleton title"></span>
+                    <span class="skeleton"></span>
+                    <span class="skeleton short"></span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>Copyright &copy; 2025 by Gilvan Pedro. Todos os direitos reservados.</p>
+            <nav class="footer-links" aria-label="Rodapé">
+                <a href="./formularioentrar.html">Indicar Vtuber</a>
+                <a href="./formulariosair.html">Solicitar remoção</a>
+                <a href="./about.html">Sobre</a>
+            </nav>
+        </div>
+    </footer>
+
+    <script src="../js/vtubers-data.js"></script>
+    <script src="../js/script.js"></script>
+</body>
+
+</html>

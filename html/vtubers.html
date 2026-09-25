@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vtubers · Vtuber Search</title>
+    <meta name="description" content="Busque Vtubers por nome, conteúdo, horário, plataforma e idioma.">
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="shortcut icon" href="../img/Logo Vtuber Search.png" type="image/x-icon">
+</head>
+
+<body>
+    <header class="site-header">
+        <div class="container">
+            <a href="../index.html" class="logo">
+                <img src="../img/Logo Vtuber Search.png" alt="">
+                <span class="gradient-text">Vtuber Search</span>
+            </a>
+            <nav class="nav" id="nav" aria-label="Principal">
+                <a href="../index.html">Home</a>
+                <a href="./vtubers.html" aria-current="page">Vtubers</a>
+                <a href="./about.html">Sobre</a>
+            </nav>
+            <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <section class="page-head">
+            <div class="container">
+                <span class="eyebrow">Catálogo</span>
+                <h1>Vtubers</h1>
+                <p>Procure pelo nome ou combine filtros para encontrar quem faz o tipo de live que você gosta.</p>
+
+                <div class="finder">
+                    <div class="finder-top">
+                        <div class="search">
+                            <label for="busca" class="sr-only">Buscar pelo nome</label>
+                            <i class='bx bx-search'></i>
+                            <input type="search" id="busca" placeholder="Buscar pelo nome..." autocomplete="off">
+                        </div>
+                        <label for="ordem" class="sr-only">Ordenar</label>
+                        <select id="ordem" class="select">
+                            <option value="recentes">Mais recentes</option>
+                            <option value="az">Nome (A–Z)</option>
+                        </select>
+                        <button type="button" class="btn btn-ghost filters-toggle" id="filters-toggle"
+                            aria-expanded="false" aria-controls="filter-groups">
+                            <i class='bx bx-slider-alt'></i>Filtros<span class="filters-count" id="filters-count"></span>
+                        </button>
+                    </div>
+                    <div class="filter-groups" id="filter-groups"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container" id="resultados">
+            <div class="results-bar">
+                <p id="resultado" aria-live="polite"></p>
+                <button type="button" class="link-btn" id="limpar" hidden>Limpar filtros</button>
+            </div>
+
+            <div class="vt-grid" id="lista"></div>
+
+            <div class="empty-state" id="vazio" hidden>
+                <i class='bx bx-ghost'></i>
+                <h3>Ninguém por aqui...</h3>
+                <p>Nenhuma Vtuber combina com essa busca. Tente remover alguns filtros.</p>
+                <button type="button" class="btn btn-ghost" id="vazio-limpar">Limpar filtros</button>
+            </div>
+
+            <nav class="pagination" id="paginacao" aria-label="Paginação" hidden></nav>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>Copyright &copy; 2025 by Gilvan Pedro. Todos os direitos reservados.</p>
+            <nav class="footer-links" aria-label="Rodapé">
+                <a href="./formularioentrar.html">Indicar Vtuber</a>
+                <a href="./formulariosair.html">Solicitar remoção</a>
+                <a href="./about.html">Sobre</a>
+            </nav>
+        </div>
+    </footer>
+
+    <script src="../js/vtubers-data.js"></script>
+    <script src="../js/script.js"></script>
+    <script src="../js/lista.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,7 @@
+# Só usados localmente (seed do banco e servidor de desenvolvimento)
+scripts/
+db/
+.env*
+
+# Imagens das vtubers agora ficam no banco; o site só precisa das imagens da raiz de img/
+img/*/

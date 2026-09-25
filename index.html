@@ -5,108 +5,136 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vtuber Search</title>
+    <meta name="description" content="Descubra Vtubers independentes e menos conhecidas.">
 
-    <link rel="stylesheet" href="./style.css">
-    <link rel="stylesheet" href="./responsivo.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="shortcut icon" href="./img/Logo Vtuber Search.png" type="image/x-icon">
 </head>
 
 <body>
-    <header>
-        <a href="#" class="logo">Vtubers</a>
-
-        <div class="nav">
-            <a href="#home">Home</a>
-            <a href="./vtubers.html">Vtubers</a>
-            <a href="./about.html">About</a>
-        </div>
-
-        <div class="nav-responsive">
-            <a href="#home">Home</a>
-            <a href="./vtubers.html">Vtubers</a>
-            <a href="./about.html">About</a>
-        </div>
-
-        <div class="menu-hamburguer">
-            <div class="bar1"></div>
-            <div class="bar2"></div>
-            <div class="bar3"></div>
+    <header class="site-header">
+        <div class="container">
+            <a href="./index.html" class="logo">
+                <img src="./img/Logo Vtuber Search.png" alt="">
+                <span class="gradient-text">Vtuber Search</span>
+            </a>
+            <nav class="nav" id="nav" aria-label="Principal">
+                <a href="./index.html" aria-current="page">Home</a>
+                <a href="./html/vtubers.html">Vtubers</a>
+                <a href="./html/about.html">Sobre</a>
+            </nav>
+            <button class="menu-toggle" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="nav">
+                <span></span><span></span><span></span>
+            </button>
         </div>
     </header>
 
-    <section class="home" id="home">
-        <div class="home-box">
-            <h1>Sobre o Site</h1>
-            <div class="home-content">
-                <img src="./img/Logo Vtuber Search.png" class="home-img"></img>
-                <p>
-                    O Vtuber Search é um site criado especialmente para ajudar você a descobrir Vtubers independentes ou
-                    menos conhecidas, dando visibilidade para talentos que merecem ser reconhecidos. Em um cenário onde
-                    muitos criadores acabam ficando escondidos entre os grandes nomes, nosso objetivo é facilitar a
-                    conexão entre fãs curiosos e novas personalidades virtuais. Aqui você encontrará uma galeria com
-                    Vtubers recém-adicionadas, poderá indicar criadoras que você
-                    acompanha e até mesmo solicitar a remoção de um perfil, caso necessário. Também oferecemos links
-                    para produtos oficiais e eventos do mundo Vtuber, tornando sua experiência mais completa.
-                </p>
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div>
+                    <span class="eyebrow">Descubra novos talentos</span>
+                    <h1>Encontre sua próxima <span class="gradient-text">Vtuber favorita</span></h1>
+                    <p>
+                        O Vtuber Search ajuda você a descobrir Vtubers independentes ou menos conhecidas, dando
+                        visibilidade para talentos que merecem ser reconhecidos. Filtre por conteúdo, horário,
+                        plataforma e idioma e encontre quem combina com você.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="./html/vtubers.html" class="btn btn-primary"><i class='bx bx-search'></i>Explorar Vtubers</a>
+                        <a href="./html/formularioentrar.html" class="btn btn-ghost"><i class='bx bx-user-plus'></i>Indicar alguém</a>
+                    </div>
+                    <div class="hero-stats">
+                        <div><strong id="total-vtubers">16</strong><span>Vtubers no site</span></div>
+                        <div><strong>3</strong><span>Plataformas</span></div>
+                        <div><strong>PT · EN</strong><span>Idiomas</span></div>
+                    </div>
+                </div>
+                <div class="hero-art">
+                    <img src="./img/Logo Vtuber Search.png" alt="Logo do Vtuber Search">
+                </div>
             </div>
-        </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="vtubers-novos">
-        <h1>Recem Adicionados</h1>
-        <div class="vtubers-img">
-            <a href="./nyhzumi.html"><img src="./img/nyhzumi/nyhzumi1.png" alt=""></a>
-
-            <a href="./inaishi.html"><img src="./img/Inaishi/Inaishi1.png" alt=""></a>
-
-            <a href="./ravielkarim.html"><img src="./img/ravielkarim/ravielkarim1.png" alt=""></a>
-
-            <a href="./dantewill.html"><img src="./img/dantewill/dantewill1.png" alt=""></a>
-
-            <a href="./hiniinha.html"><img src="./img/hiniinha/hiniinha1.png" alt=""></a>
-        </div>
-    </section>
-
-    <section class="formularios">
-        <div class="formulario-entrar">
-            <h1>Deseja Aparecer Aqui?</h1>
-            <p>
-                Você é uma Vtuber ou conhece alguma que merece mais visibilidade?
-                O Vtuber Search foi criado exatamente para isso: dar espaço para talentos que ainda estão crescendo, mas
-                que já entregam conteúdo de qualidade.
-
-                Se você quer fazer parte da nossa lista, ou indicar alguém que merece estar aqui, basta clicar no botão
-                abaixo e enviar as informações necessárias.
-                Vamos analisar com carinho e adicionar o perfil o quanto antes!
-            </p>
-            <div class="botao">
-                <a href="./formularioentrar.html" class="btn">Indicar Vtuber</a>
+        <section class="section">
+            <div class="container">
+                <div class="section-head">
+                    <div>
+                        <span class="eyebrow">Novidades</span>
+                        <h2 class="section-title">Recém-adicionadas</h2>
+                    </div>
+                    <a href="./html/vtubers.html" class="btn btn-ghost">Ver todas<i class='bx bx-right-arrow-alt'></i></a>
+                </div>
+                <div class="vt-grid" id="recentes"></div>
             </div>
-        </div>
+        </section>
 
-        <div class="formulario-sair">
-            <h1>Não Quer Aparecer Aqui?</h1>
-            <p>
-                Respeitamos totalmente sua vontade!
-                Se você encontrou sua imagem ou nome no nosso site e prefere não participar, é só clicar no botão abaixo
-                e enviar uma solicitação de remoção.
-
-                Levamos isso a sério e garantimos que seu conteúdo será retirado o mais rápido possível, sem
-                complicações.
-            </p>
-            <div class="botao">
-                <a href="./formulariosair.html" class="btn">Solicitar Remoção</a>
+        <section class="section">
+            <div class="container">
+                <div class="section-head">
+                    <div>
+                        <span class="eyebrow">Como funciona</span>
+                        <h2 class="section-title">Feito para quem ama Vtubers</h2>
+                    </div>
+                </div>
+                <div class="features">
+                    <div class="feature">
+                        <div class="feature-icon"><i class='bx bx-search-alt'></i></div>
+                        <h3>Descubra</h3>
+                        <p>Busque pelo nome ou combine filtros de conteúdo, horário, plataforma e idioma.</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon"><i class='bx bx-heart'></i></div>
+                        <h3>Apoie</h3>
+                        <p>Cada perfil traz bio, clipe em destaque e links diretos para Twitch, YouTube e X.</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon"><i class='bx bx-group'></i></div>
+                        <h3>Participe</h3>
+                        <p>Indique Vtubers que você acompanha ou peça a remoção do seu perfil quando quiser.</p>
+                    </div>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <footer>
-        <p>
-            Copyright &copy; 2025 by &lt;Gilvan Pedro&gt;. All rights reserved.
-        </p>
+        <section class="section">
+            <div class="container cta-grid">
+                <div class="cta-card">
+                    <span class="eyebrow">Indicações</span>
+                    <h3>Deseja aparecer aqui?</h3>
+                    <p>
+                        Você é uma Vtuber ou conhece alguma que merece mais visibilidade? Envie as informações e
+                        vamos analisar com carinho para adicionar o perfil o quanto antes!
+                    </p>
+                    <a href="./html/formularioentrar.html" class="btn btn-primary"><i class='bx bx-user-plus'></i>Indicar Vtuber</a>
+                </div>
+                <div class="cta-card alt">
+                    <span class="eyebrow">Privacidade</span>
+                    <h3>Não quer aparecer aqui?</h3>
+                    <p>
+                        Respeitamos totalmente sua vontade. Envie uma solicitação de remoção e seu conteúdo será
+                        retirado o mais rápido possível, sem complicações.
+                    </p>
+                    <a href="./html/formulariosair.html" class="btn btn-ghost"><i class='bx bx-user-minus'></i>Solicitar remoção</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>Copyright &copy; 2025 by Gilvan Pedro. Todos os direitos reservados.</p>
+            <nav class="footer-links" aria-label="Rodapé">
+                <a href="./html/formularioentrar.html">Indicar Vtuber</a>
+                <a href="./html/formulariosair.html">Solicitar remoção</a>
+                <a href="./html/about.html">Sobre</a>
+            </nav>
+        </div>
     </footer>
+
+    <script src="./js/vtubers-data.js"></script>
+    <script src="./js/script.js"></script>
 </body>
-<script src="./script.js"></script>
 
 </html>

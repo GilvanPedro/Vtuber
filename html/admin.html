@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Painel · Vtuber Search</title>
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="shortcut icon" href="../img/Logo Vtuber Search.png" type="image/x-icon">
+</head>
+
+<body class="admin">
+    <header class="site-header">
+        <div class="container">
+            <a href="../index.html" class="logo">
+                <img src="../img/Logo Vtuber Search.png" alt="">
+                <span class="gradient-text">Painel</span>
+            </a>
+            <div class="admin-actions">
+                <a href="../index.html" class="btn btn-ghost btn-sm" target="_blank" rel="noopener"><i class='bx bx-link-external'></i>Ver site</a>
+                <button type="button" class="btn btn-ghost btn-sm" id="sair" hidden><i class='bx bx-log-out'></i>Sair</button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Login -->
+        <section class="section" id="tela-login" hidden>
+            <form class="login-card" id="form-login">
+                <div class="feature-icon"><i class='bx bx-lock-alt'></i></div>
+                <h1>Painel do Vtuber Search</h1>
+                <p>Área restrita para cadastrar, editar e excluir Vtubers.</p>
+                <label class="field">
+                    <span>Senha</span>
+                    <input type="password" id="senha" autocomplete="current-password" required>
+                </label>
+                <p class="form-error" id="erro-login" role="alert"></p>
+                <button type="submit" class="btn btn-primary"><i class='bx bx-log-in'></i>Entrar</button>
+            </form>
+        </section>
+
+        <!-- Painel -->
+        <section class="admin-layout container" id="tela-painel" hidden>
+            <aside class="admin-sidebar">
+                <button type="button" class="btn btn-primary" id="nova"><i class='bx bx-plus'></i>Nova Vtuber</button>
+                <div class="search">
+                    <label for="busca-admin" class="sr-only">Buscar Vtuber</label>
+                    <i class='bx bx-search'></i>
+                    <input type="search" id="busca-admin" placeholder="Buscar por nome ou id..." autocomplete="off">
+                </div>
+                <p class="admin-count" id="contagem"></p>
+                <ul class="admin-list" id="lista-admin"></ul>
+            </aside>
+
+            <div class="admin-main">
+                <div class="empty-state" id="nada-selecionado">
+                    <i class='bx bx-pointer'></i>
+                    <h3>Escolha uma Vtuber</h3>
+                    <p>Selecione alguém na lista para editar, ou clique em “Nova Vtuber”.</p>
+                </div>
+
+                <form class="panel editor" id="editor" hidden novalidate>
+                    <div class="editor-head">
+                        <div>
+                            <span class="eyebrow" id="editor-modo">Nova Vtuber</span>
+                            <h2 id="editor-titulo">Nova Vtuber</h2>
+                        </div>
+                        <a class="btn btn-ghost btn-sm" id="ver-perfil" target="_blank" rel="noopener" hidden><i class='bx bx-show'></i>Ver perfil</a>
+                    </div>
+
+                    <fieldset class="editor-section">
+                        <legend>Informações</legend>
+                        <div class="field-grid">
+                            <label class="field">
+                                <span>Nome *</span>
+                                <input type="text" name="nome" maxlength="60" required>
+                            </label>
+                            <label class="field">
+                                <span>Identificador (URL) *</span>
+                                <input type="text" name="id" maxlength="40" pattern="[a-z0-9-]+" required>
+                                <small>Só minúsculas, números e hífens. Ex.: <code>gigi-murin</code></small>
+                            </label>
+                            <label class="field">
+                                <span>Cor de destaque</span>
+                                <span class="color-field">
+                                    <input type="color" name="cor" value="#e45fd9">
+                                    <code id="cor-hex">#e45fd9</code>
+                                </span>
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="editor-section">
+                        <legend>Imagens</legend>
+                        <div class="field-grid images">
+                            <div class="image-field" data-tipo="card">
+                                <span class="image-label">Card (lista e home) *</span>
+                                <div class="image-preview"><i class='bx bx-image-add'></i><img alt=""></div>
+                                <label class="btn btn-ghost btn-sm">
+                                    <i class='bx bx-upload'></i>Escolher imagem
+                                    <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+                                </label>
+                            </div>
+                            <div class="image-field" data-tipo="perfil">
+                                <span class="image-label">Perfil (página da Vtuber)</span>
+                                <div class="image-preview tall"><i class='bx bx-image-add'></i><img alt=""></div>
+                                <label class="btn btn-ghost btn-sm">
+                                    <i class='bx bx-upload'></i>Escolher imagem
+                                    <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+                                </label>
+                            </div>
+                        </div>
+                        <small class="hint">As imagens são reduzidas e convertidas para WEBP antes do envio. Sem imagem de perfil, o perfil usa a do card.</small>
+                    </fieldset>
+
+                    <fieldset class="editor-section">
+                        <legend>Categorias</legend>
+                        <div class="filter-groups" id="categorias"></div>
+                    </fieldset>
+
+                    <fieldset class="editor-section">
+                        <legend>Bio</legend>
+                        <label class="field">
+                            <span class="sr-only">Bio</span>
+                            <textarea name="bio" rows="9" maxlength="6000"></textarea>
+                            <small>Separe parágrafos com uma linha em branco. Use <code>**texto**</code> para <strong>negrito</strong> e <code>==texto==</code> para destacar na cor da Vtuber.</small>
+                        </label>
+                    </fieldset>
+
+                    <fieldset class="editor-section">
+                        <legend>Redes sociais</legend>
+                        <div class="field-grid">
+                            <label class="field"><span><i class='bx bxl-twitch'></i> Twitch</span><input type="url" name="twitch" placeholder="https://www.twitch.tv/..."></label>
+                            <label class="field"><span><i class='bx bxl-youtube'></i> YouTube</span><input type="url" name="youtube" placeholder="https://www.youtube.com/@..."></label>
+                            <label class="field"><span><i class='bx bxl-twitter'></i> X / Twitter</span><input type="url" name="x" placeholder="https://x.com/..."></label>
+                            <label class="field"><span><i class='bx bx-play-circle'></i> Kick</span><input type="url" name="kick" placeholder="https://kick.com/..."></label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="editor-section">
+                        <legend>Vídeos do YouTube</legend>
+                        <ul class="video-rows" id="videos"></ul>
+                        <button type="button" class="btn btn-ghost btn-sm" id="add-video"><i class='bx bx-plus'></i>Adicionar vídeo</button>
+                        <small class="hint">Cole o link do vídeo (watch, youtu.be ou shorts). O primeiro aparece em destaque. Links de shorts são marcados como verticais automaticamente.</small>
+                    </fieldset>
+
+                    <p class="form-error" id="erro-editor" role="alert"></p>
+
+                    <div class="editor-footer">
+                        <button type="button" class="btn btn-danger" id="excluir" hidden><i class='bx bx-trash'></i>Excluir</button>
+                        <span class="spacer"></span>
+                        <button type="button" class="btn btn-ghost" id="cancelar">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" id="salvar"><i class='bx bx-save'></i>Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Confirmação de exclusão -->
+    <dialog class="modal" id="modal-excluir">
+        <form method="dialog">
+            <div class="feature-icon danger"><i class='bx bx-trash'></i></div>
+            <h2>Excluir <span id="excluir-nome"></span>?</h2>
+            <p>Os dados, imagens e vídeos dessa Vtuber serão apagados do banco. <strong>Isso não pode ser desfeito.</strong></p>
+            <label class="field">
+                <span>Digite <code id="excluir-id"></code> para confirmar</span>
+                <input type="text" id="excluir-confirmacao" autocomplete="off">
+            </label>
+            <div class="editor-footer">
+                <span class="spacer"></span>
+                <button value="cancelar" class="btn btn-ghost">Cancelar</button>
+                <button value="confirmar" class="btn btn-danger" id="confirmar-exclusao" disabled><i class='bx bx-trash'></i>Excluir</button>
+            </div>
+        </form>
+    </dialog>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="../js/vtubers-data.js"></script>
+    <script src="../js/admin.js"></script>
+</body>
+
+</html>
