@@ -24,6 +24,28 @@ if (recentes) {
         });
 }
 
+// Home: "Estou com sorte" abre o perfil de uma Vtuber aleatória (sem repetir a última sorteada)
+const botaoSorte = document.getElementById('sorte');
+if (botaoSorte) {
+    botaoSorte.addEventListener('click', async () => {
+        botaoSorte.disabled = true;
+        botaoSorte.classList.add('rolando');
+        try {
+            const lista = await carregarVtubers();
+            let ultima = null;
+            try { ultima = sessionStorage.getItem('ultimaSorteada'); } catch { /* sem armazenamento */ }
+            const opcoes = lista.length > 1 ? lista.filter(vt => vt.id !== ultima) : lista;
+            const sorteada = opcoes[Math.floor(Math.random() * opcoes.length)];
+            if (!sorteada) throw new Error('lista vazia');
+            try { sessionStorage.setItem('ultimaSorteada', sorteada.id); } catch { /* sem armazenamento */ }
+            location.href = urlPerfil(sorteada.id);
+        } catch {
+            botaoSorte.disabled = false;
+            botaoSorte.classList.remove('rolando');
+        }
+    });
+}
+
 // Perfil: html/vtuber.html?id=<id>
 const perfil = document.getElementById('perfil');
 if (perfil) {

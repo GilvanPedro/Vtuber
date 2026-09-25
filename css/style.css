@@ -480,6 +480,22 @@ h3 {
     margin-top: 28px;
 }
 
+.btn-sorte i {
+    transition: transform 0.4s;
+}
+
+.btn-sorte:hover i {
+    transform: rotate(-20deg) scale(1.1);
+}
+
+.btn-sorte.rolando i {
+    animation: rolar 0.5s linear infinite;
+}
+
+@keyframes rolar {
+    to { transform: rotate(360deg); }
+}
+
 .hero-stats {
     display: flex;
     gap: 32px;
