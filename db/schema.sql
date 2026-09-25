@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS vtubers (
     bio           TEXT NOT NULL DEFAULT '',        -- em português; parágrafos separados por linha em branco; **negrito** e ==destaque==
     bio_en        TEXT NOT NULL DEFAULT '',        -- mesma bio em inglês (vazia = site mostra a versão em português)
     redes         JSONB NOT NULL DEFAULT '{}',     -- { twitch, youtube, x, kick, instagram }
-    videos        JSONB NOT NULL DEFAULT '[]',     -- [{ id: '<id do YouTube>', vertical: bool }]
+    videos        JSONB NOT NULL DEFAULT '[]',     -- momentos do criador: [{ tipo: youtube|twitch-clip|twitch-video, id, vertical }]
     criado_em     TIMESTAMPTZ NOT NULL DEFAULT now(),
     atualizado_em TIMESTAMPTZ NOT NULL DEFAULT now()
 );

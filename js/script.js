@@ -75,7 +75,7 @@ async function carregarPerfil(id) {
 
     const videos = vt.videos.map((v, i) => `
         <div class="video${v.vertical ? ' vertical' : ''}">
-            <iframe src="https://www.youtube.com/embed/${esc(v.id)}" title="${esc(t('perfil.video', { n: i + 1, nome: vt.nome }))}" loading="lazy"
+            <iframe src="${esc(urlDoPlayer(v))}" title="${esc(t('perfil.video', { n: i + 1, nome: vt.nome }))}" loading="lazy"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
         </div>`);
@@ -108,11 +108,20 @@ async function carregarPerfil(id) {
                 </article>
                 ${videos.length ? `
                 <div class="panel">
-                    <h2 class="panel-title">${videos.length > 1 ? t('perfil.videos') : t('perfil.destaque')}</h2>
+                    <h2 class="panel-title">${t('perfil.momentos')}</h2>
                     <div class="video-list">${videos.join('')}</div>
                 </div>` : ''}
             </div>
         </section>`;
+}
+
+// Player de cada momento do criador. A Twitch exige o domínio do site no parâmetro "parent".
+function urlDoPlayer({ tipo = 'youtube', id }) {
+    const parent = encodeURIComponent(location.hostname);
+    const video = encodeURIComponent(id);
+    if (tipo === 'twitch-clip') return `https://clips.twitch.tv/embed?clip=${video}&parent=${parent}&autoplay=false`;
+    if (tipo === 'twitch-video') return `https://player.twitch.tv/?video=${video}&parent=${parent}&autoplay=false`;
+    return `https://www.youtube.com/embed/${video}`;
 }
 
 function mostrarErroPerfil(mensagem) {

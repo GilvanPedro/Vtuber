@@ -1898,11 +1898,44 @@ code {
 }
 
 .video-thumb {
+    position: relative;
+    display: grid;
+    place-items: center;
     width: 96px;
     aspect-ratio: 16 / 9;
-    object-fit: cover;
     border-radius: 8px;
     background: var(--bg-soft);
+    overflow: hidden;
+    font-size: 1.8rem;
+}
+
+.video-thumb img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.video-thumb img:not([src]) {
+    display: none;
+}
+
+.video-thumb[data-tipo^="twitch"] {
+    background: rgba(145, 70, 255, 0.18);
+    color: #b58cff;
+}
+
+.video-tipo {
+    min-width: 116px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.video-row.invalid .video-tipo {
+    color: #ff7b8e;
 }
 
 .video-row.invalid input[type="url"] {
@@ -2048,8 +2081,10 @@ body.admin .site-footer {
         grid-column: 2 / -1;
     }
 
-    .video-row .check {
+    .video-row .video-tipo {
         grid-column: 1 / 2;
+        min-width: 0;
+        white-space: normal;
     }
 
     .editor > .editor-footer {

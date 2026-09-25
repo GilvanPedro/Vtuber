@@ -58,18 +58,48 @@ const slug = texto => texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase
 
 const normalizar = texto => texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
-function idDoYoutube(url) {
-    const texto = url.trim();
-    if (/^[\w-]{11}$/.test(texto)) return { id: texto, shorts: false };
-    try {
-        const u = new URL(texto);
-        const id = u.hostname.endsWith('youtu.be')
-            ? u.pathname.slice(1)
-            : u.searchParams.get('v') || u.pathname.match(/^\/(?:shorts|embed|live)\/([\w-]{11})/)?.[1];
-        return /^[\w-]{11}$/.test(id || '') ? { id, shorts: u.pathname.startsWith('/shorts/') } : null;
-    } catch {
-        return null;
+// Mesma regra de lib/validar.js (identificarVideo): reconhece o link e devolve { tipo, id, vertical } ou null.
+function identificarVideo(entrada) {
+    const texto = String(entrada || '').trim();
+    if (/^[\w-]{11}$/.test(texto)) return { tipo: 'youtube', id: texto, vertical: false };
+
+    let url;
+    try { url = new URL(texto); } catch { return null; }
+    if (!['https:', 'http:'].includes(url.protocol)) return null;
+    const host = url.hostname.replace(/^(www|m)\./, '');
+    const partes = url.pathname.split('/').filter(Boolean);
+
+    if (host === 'youtu.be' || host === 'youtube.com') {
+        const id = host === 'youtu.be'
+            ? partes[0]
+            : url.searchParams.get('v') || (['shorts', 'embed', 'live'].includes(partes[0]) ? partes[1] : null);
+        return /^[\w-]{11}$/.test(id || '') ? { tipo: 'youtube', id, vertical: partes[0] === 'shorts' } : null;
     }
+
+    const slugValido = slug => /^[\w-]{3,100}$/.test(slug || '');
+    if (host === 'clips.twitch.tv') {
+        const slug = partes[0] === 'embed' ? url.searchParams.get('clip') : partes[0];
+        return slugValido(slug) ? { tipo: 'twitch-clip', id: slug, vertical: false } : null;
+    }
+    if (host === 'twitch.tv') {
+        if (partes[1] === 'clip' && slugValido(partes[2])) return { tipo: 'twitch-clip', id: partes[2], vertical: false };
+        if (partes[0] === 'videos' && /^\d+$/.test(partes[1] || '')) return { tipo: 'twitch-video', id: partes[1], vertical: false };
+    }
+    return null;
+}
+
+// Link editável a partir do que está salvo (dados antigos não têm "tipo": são do YouTube).
+function linkDoVideo({ tipo = 'youtube', id, vertical }) {
+    if (tipo === 'twitch-clip') return `https://clips.twitch.tv/${id}`;
+    if (tipo === 'twitch-video') return `https://www.twitch.tv/videos/${id}`;
+    return vertical ? `https://www.youtube.com/shorts/${id}` : `https://www.youtube.com/watch?v=${id}`;
+}
+
+function descricaoDoVideo(video) {
+    if (!video) return 'Link não reconhecido';
+    if (video.tipo === 'twitch-clip') return 'Twitch · Clipe';
+    if (video.tipo === 'twitch-video') return 'Twitch · Vídeo';
+    return video.vertical ? 'YouTube · Shorts' : 'YouTube · Vídeo';
 }
 
 // ---------- Login ----------
@@ -402,8 +432,7 @@ function preencherDetalhes(vt) {
     REDES.forEach(rede => { campos[rede].value = vt?.redes?.[rede] ?? ''; });
     montarRedesExtras(vt?.redes ?? {});
     videosEl.innerHTML = '';
-    (vt?.videos ?? []).forEach(v => adicionarVideo(
-        v.vertical ? `https://www.youtube.com/shorts/${v.id}` : `https://www.youtube.com/watch?v=${v.id}`, v.vertical));
+    (vt?.videos ?? []).forEach(v => adicionarVideo(linkDoVideo(v)));
 }
 
 function carregandoDetalhes(sim) {
@@ -584,38 +613,38 @@ editor.querySelectorAll('.image-field input[type="file"]').forEach(input => {
     });
 });
 
-// ---------- Vídeos ----------
-function adicionarVideo(url = '', vertical = false) {
+// ---------- Momentos do criador (YouTube e Twitch) ----------
+function adicionarVideo(url = '') {
     const li = document.createElement('li');
     li.className = 'video-row';
     li.innerHTML = `
-        <img class="video-thumb" alt="" loading="lazy">
-        <input type="url" placeholder="https://www.youtube.com/watch?v=..." aria-label="Link do vídeo">
-        <label class="check"><input type="checkbox"> Vertical</label>
+        <span class="video-thumb"><img alt="" loading="lazy"><i class='bx'></i></span>
+        <input type="url" placeholder="Link do YouTube ou da Twitch" aria-label="Link do momento">
+        <span class="video-tipo"></span>
         <button type="button" class="icon-btn" title="Subir"><i class='bx bx-up-arrow-alt'></i></button>
         <button type="button" class="icon-btn danger" title="Remover"><i class='bx bx-x'></i></button>`;
-    const [link, check] = li.querySelectorAll('input');
-    link.value = url;
-    check.checked = vertical;
-    atualizarThumb(li);
+    li.querySelector('input').value = url;
+    atualizarVideo(li);
     videosEl.appendChild(li);
     return li;
 }
 
-function atualizarThumb(li) {
-    const yt = idDoYoutube(li.querySelector('input[type="url"]').value);
+// Mostra o tipo detectado e a miniatura (a Twitch não tem miniatura pública: usa o ícone dela).
+function atualizarVideo(li) {
+    const texto = li.querySelector('input').value.trim();
+    const video = identificarVideo(texto);
     const thumb = li.querySelector('.video-thumb');
-    if (yt) thumb.src = `https://i.ytimg.com/vi/${yt.id}/mqdefault.jpg`;
-    else thumb.removeAttribute('src');
-    li.classList.toggle('invalid', Boolean(li.querySelector('input[type="url"]').value.trim()) && !yt);
+    const img = thumb.querySelector('img');
+    if (video?.tipo === 'youtube') img.src = `https://i.ytimg.com/vi/${video.id}/mqdefault.jpg`;
+    else img.removeAttribute('src');
+    thumb.dataset.tipo = video?.tipo ?? '';
+    thumb.querySelector('i').className = `bx ${video?.tipo.startsWith('twitch') ? 'bxl-twitch' : ''}`;
+    li.querySelector('.video-tipo').textContent = texto ? descricaoDoVideo(video) : '';
+    li.classList.toggle('invalid', Boolean(texto) && !video);
 }
 
 videosEl.addEventListener('input', event => {
-    const li = event.target.closest('.video-row');
-    if (event.target.type === 'url') {
-        atualizarThumb(li);
-        if (idDoYoutube(event.target.value)?.shorts) li.querySelector('input[type="checkbox"]').checked = true;
-    }
+    if (event.target.type === 'url') atualizarVideo(event.target.closest('.video-row'));
 });
 
 videosEl.addEventListener('click', event => {
@@ -636,10 +665,7 @@ function coletar() {
     const campos = editor.elements;
     const marcados = grupo => [...editor.querySelectorAll(`#categorias input[name="${grupo}"]:checked`)].map(i => i.value);
     const videos = [...videosEl.querySelectorAll('.video-row')]
-        .map(li => ({
-            url: li.querySelector('input[type="url"]').value.trim(),
-            vertical: li.querySelector('input[type="checkbox"]').checked
-        }))
+        .map(li => ({ url: li.querySelector('input[type="url"]').value.trim() }))
         .filter(v => v.url);
 
     return {
@@ -665,7 +691,7 @@ function validarNoCliente(dados) {
     if (!dados.nome) return 'Informe o nome.';
     if (!/^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/.test(dados.id)) return 'Identificador inválido: use só minúsculas, números e hífens.';
     if (!atual && !dados.imagens.card) return 'Escolha a imagem do card.';
-    if (dados.videos.some(v => !idDoYoutube(v.url))) return 'Há um link de vídeo inválido (marcado em vermelho).';
+    if (dados.videos.some(v => !identificarVideo(v.url))) return 'Há um link em "Momentos do criador" que não foi reconhecido (marcado em vermelho).';
     return null;
 }
 
