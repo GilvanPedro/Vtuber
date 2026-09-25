@@ -28,7 +28,7 @@ if (recentes) {
 // (sem repetir a última sorteada).
 const botaoSorte = document.getElementById('sorte');
 const QUEDA_DO_DADO_MS = 1150;  // queda + quique (igual à animação em style.css)
-const BRILHO_DO_DADO_MS = 750;  // brilho + nome antes de abrir o perfil
+const BRILHO_DO_DADO_MS = 900;  // brilho + nome (e o som de sorte) antes de abrir o perfil
 
 // Pontinhos de cada face numa grade 3x3 (posições de 1 a 9)
 const PONTOS_DAS_FACES = { 1: [5], 2: [1, 9], 3: [1, 5, 9], 4: [1, 3, 7, 9], 5: [1, 3, 5, 7, 9], 6: [1, 3, 4, 6, 7, 9] };
@@ -79,7 +79,10 @@ if (botaoSorte) {
         botaoSorte.disabled = true;
         const semAnimacao = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         const tela = semAnimacao ? null : criarTelaDoDado();
-        if (tela) document.body.appendChild(tela);
+        if (tela) {
+            document.body.appendChild(tela);
+            if (typeof SonsDoDado !== 'undefined') SonsDoDado.rolarDado();
+        }
         try {
             // A lista carrega enquanto o dado cai (normalmente já está em memória)
             // No catálogo, sorteia só entre as Vtubers da busca/filtros atuais (lista.js); na home, entre todas.
@@ -90,6 +93,7 @@ if (botaoSorte) {
             if (!sorteada) throw new Error('lista vazia');
             if (tela) {
                 tela.classList.add('pousou');
+                if (typeof SonsDoDado !== 'undefined') SonsDoDado.sorte();
                 tela.style.setProperty('--accent', sorteada.cor);
                 tela.querySelector('.sorte-legenda').innerHTML = `<strong>${esc(sorteada.nome)}</strong>`;
                 await esperar(BRILHO_DO_DADO_MS);

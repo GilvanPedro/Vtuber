@@ -41,6 +41,11 @@ ALTER TABLE vtubers ADD COLUMN IF NOT EXISTS fuso TEXT NOT NULL DEFAULT 'America
 -- A coluna horario vale para o fuso da própria vtuber; fusos sem entrada aqui são convertidos automaticamente.
 ALTER TABLE vtubers ADD COLUMN IF NOT EXISTS horario_fusos JSONB NOT NULL DEFAULT '{}';
 
+-- Seguidores na Twitch e inscritos no YouTube (atualizados pela visita ao perfil, pelo painel e 1x por dia)
+ALTER TABLE vtubers ADD COLUMN IF NOT EXISTS seguidores_twitch INTEGER;
+ALTER TABLE vtubers ADD COLUMN IF NOT EXISTS inscritos_youtube INTEGER;
+ALTER TABLE vtubers ADD COLUMN IF NOT EXISTS estatisticas_em TIMESTAMPTZ;
+
 -- Opções cadastráveis pelo painel, separadas por grupo:
 --   'tags' (conteúdo), 'plataforma' e 'idioma'. O id é gerado a partir do nome em português.
 CREATE TABLE IF NOT EXISTS tags (

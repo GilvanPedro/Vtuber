@@ -136,6 +136,23 @@ async function carregarVtuber(id) {
     return r.json();
 }
 
+// Seguidores na Twitch + inscritos no YouTube (null se nenhum dos dois é conhecido)
+function seguidoresTotais(vt) {
+    const valores = [vt.seguidoresTwitch, vt.inscritosYoutube].filter(v => typeof v === 'number');
+    return valores.length ? valores.reduce((a, b) => a + b, 0) : null;
+}
+
+// Dica do card: "12.345 seguidores na Twitch + 6.789 inscritos no YouTube"
+function tituloSeguidores(vt) {
+    const partes = [];
+    if (typeof vt.seguidoresTwitch === 'number') partes.push(`${vt.seguidoresTwitch.toLocaleString(document.documentElement.lang)} ${typeof t === 'function' ? t('stats.seguidores') : 'seguidores na Twitch'}`);
+    if (typeof vt.inscritosYoutube === 'number') partes.push(`${vt.inscritosYoutube.toLocaleString(document.documentElement.lang)} ${typeof t === 'function' ? t('stats.inscritos') : 'inscritos no YouTube'}`);
+    return partes.join(' + ');
+}
+
+const formatarCompacto = valor => new Intl.NumberFormat(document.documentElement.lang || 'pt-BR',
+    { notation: 'compact', maximumFractionDigits: 1 }).format(valor);
+
 /* Card usado na lista e na home. Retorna um <a> pronto para inserir. */
 function criarCardVtuber(vt) {
     const card = document.createElement('a');
@@ -147,6 +164,7 @@ function criarCardVtuber(vt) {
         .map(p => `<i class='bx ${iconePlataforma(p)}' title="${rotulo('plataforma', p)}"></i>`)
         .join('');
     const idiomas = vt.idioma.map(i => rotulo('idioma', i)).join(' · ');
+    const total = seguidoresTotais(vt);
     const tags = vt.tags.slice(0, 3).map(t => `<span class="chip">${rotulo('tags', t)}</span>`).join('');
     const extra = vt.tags.length > 3 ? `<span class="chip">+${vt.tags.length - 3}</span>` : '';
     const imagem = vt.img
@@ -160,6 +178,7 @@ function criarCardVtuber(vt) {
             <div class="vt-card-meta">
                 <span>${plataformas}</span>
                 <span><i class='bx bx-globe'></i>${idiomas}</span>
+                ${total == null ? '' : `<span class="vt-card-seguidores" title="${esc(tituloSeguidores(vt))}"><i class='bx bx-group'></i>${formatarCompacto(total)}</span>`}
             </div>
             <div class="vt-card-tags">${tags}${extra}</div>
         </div>`;

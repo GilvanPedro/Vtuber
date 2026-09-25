@@ -10,6 +10,12 @@ import { validarVtuber } from '../../lib/validar.js';
 import { opcoesPorGrupo } from '../../lib/tags.js';
 import { listarVtubers, buscarVtuber, criarVtuber, atualizarVtuber, excluirVtuber } from '../../lib/vtubers.js';
 import { limparCachePublico } from '../../lib/cache.js';
+import { atualizarEstatisticas } from '../../lib/estatisticas.js';
+import { waitUntil } from '@vercel/functions';
+
+// Depois de salvar, busca seguidores/inscritos em segundo plano (não atrasa a resposta do painel).
+const atualizarNumerosDepois = vt => waitUntil(
+    atualizarEstatisticas(vt.id, vt.redes).catch(e => console.error('Estatísticas após salvar:', e.message)));
 
 const lerVtuber = async request =>
     validarVtuber(await request.json().catch(() => null), { opcoes: await opcoesPorGrupo() });
@@ -25,6 +31,7 @@ export const POST = protegida(async request => {
     if (!vt.imagens.card) return erro('Envie a imagem do card.', 400);
     const criada = await criarVtuber(vt);
     await limparCachePublico();
+    atualizarNumerosDepois(criada);
     return json(criada, 201, SEM_CACHE);
 });
 
@@ -32,6 +39,7 @@ export const PUT = protegida(async (request, id) => {
     if (!id) return erro('Vtuber não encontrada.', 404);
     const atualizada = await atualizarVtuber(id, await lerVtuber(request));
     await limparCachePublico();
+    atualizarNumerosDepois(atualizada);
     return json(atualizada, 200, SEM_CACHE);
 });
 

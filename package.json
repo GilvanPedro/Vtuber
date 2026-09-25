@@ -7,7 +7,8 @@
     "seed": "node scripts/seed.mjs",
     "otimizar-imagens": "node scripts/otimizar-imagens.mjs",
     "migrar": "node scripts/migrar.mjs",
-    "testar-estatisticas": "node scripts/testar-estatisticas.mjs"
+    "testar-estatisticas": "node scripts/testar-estatisticas.mjs",
+    "atualizar-estatisticas": "node scripts/atualizar-estatisticas.mjs"
   },
   "engines": {
     "node": ">=20"

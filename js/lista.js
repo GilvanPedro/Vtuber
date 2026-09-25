@@ -18,6 +18,8 @@ const limpar = document.getElementById('limpar');
 const vazio = document.getElementById('vazio');
 const paginacao = document.getElementById('paginacao');
 
+const ORDENS = ['recentes', 'az', 'mais-seguidores', 'menos-seguidores'];
+
 const estado = {
     busca: '',
     ordem: 'recentes',
@@ -46,7 +48,7 @@ function montarFiltros() {
 function lerUrl() {
     const params = new URLSearchParams(location.search);
     estado.busca = params.get('q') || '';
-    estado.ordem = params.get('ordem') === 'az' ? 'az' : 'recentes';
+    estado.ordem = ORDENS.includes(params.get('ordem')) ? params.get('ordem') : 'recentes';
     GRUPOS.forEach(g => {
         estado.filtros[g] = new Set((params.get(g) || '').split(',').filter(v => v in FILTROS[g].opcoes));
     });
@@ -91,6 +93,15 @@ function filtrar() {
     );
     if (estado.ordem === 'az') {
         lista.sort((a, b) => a.nome.localeCompare(b.nome, document.documentElement.lang));
+    } else if (estado.ordem === 'mais-seguidores' || estado.ordem === 'menos-seguidores') {
+        // Soma Twitch + YouTube; quem não tem nenhum número vai para o fim nas duas ordens.
+        const sinal = estado.ordem === 'mais-seguidores' ? -1 : 1;
+        lista.sort((a, b) => {
+            const ta = seguidoresTotais(a);
+            const tb = seguidoresTotais(b);
+            if (ta == null || tb == null) return (ta == null) - (tb == null);
+            return sinal * (ta - tb);
+        });
     }
     return lista;
 }
