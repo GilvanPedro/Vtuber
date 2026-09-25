@@ -81,7 +81,9 @@ function filtrar() {
     // Dentro de um mesmo grupo basta bater uma opção (OU); entre grupos todas precisam bater (E).
     const lista = VTUBERS.filter(vt =>
         (!termo || normalizar(vt.nome).includes(termo) || normalizar(vt.id).includes(termo)) &&
-        GRUPOS.every(g => estado.filtros[g].size === 0 || vt[g].some(v => estado.filtros[g].has(v)))
+        GRUPOS.every(g => estado.filtros[g].size === 0 || vt[g].some(v => estado.filtros[g].has(v)) ||
+            // Quem tem horário "diverso" aparece em qualquer filtro de horário.
+            (g === 'horario' && vt.horario.includes('diverso')))
     );
     if (estado.ordem === 'az') {
         lista.sort((a, b) => a.nome.localeCompare(b.nome, document.documentElement.lang));

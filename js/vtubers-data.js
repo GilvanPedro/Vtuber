@@ -27,7 +27,8 @@ const FILTROS = {
             'manha': { pt: 'Manhã', en: 'Morning' },
             'tarde': { pt: 'Tarde', en: 'Afternoon' },
             'noite': { pt: 'Noite', en: 'Evening' },
-            'madrugada': { pt: 'Madrugada', en: 'Late night' }
+            'madrugada': { pt: 'Madrugada', en: 'Late night' },
+            'diverso': { pt: 'Diverso', en: 'Varied' } // faz lives em muitos horários diferentes
         }
     },
     plataforma: {
