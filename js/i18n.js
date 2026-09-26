@@ -121,7 +121,7 @@ const TEXTOS = {
         'sobre.fotoAlt': "Arte que representa Gilvan Pedro",
         'sobre.eyebrow': "Quem está por trás do site",
         'sobre.h1': 'Oi, eu sou o <span class="gradient-text">Gilvan Pedro</span>',
-        'sobre.p1': "Tenho 18 anos, sou do Brasil e estudo Engenharia de Software no SENAI Goiás. Gosto de tecnologia desde sempre, mas o que mais me move é pegar uma ideia e transformar em algo que as pessoas usem de verdade.",
+        'sobre.p1': "Tenho {idade} anos, sou do Brasil e estudo Engenharia de Software no SENAI Goiás. Gosto de tecnologia desde sempre, mas o que mais me move é pegar uma ideia e transformar em algo que as pessoas usem de verdade.",
         'sobre.p2': "O Vtuber Search nasceu assim. Tem muita Vtuber talentosa que acaba escondida atrás dos grandes nomes, e eu queria um lugar onde fosse fácil encontrar essas pessoas: buscando por tipo de conteúdo, horário, plataforma e idioma, com espaço para a própria comunidade indicar novos talentos.",
         'sobre.p3': "Meu objetivo é me tornar um desenvolvedor completo, que domina a lógica e o código mas também sabe ouvir, observar e construir experiências que fazem diferença. Isso é só o começo, e o site vai continuar crescendo junto comigo.",
         'sobre.curso': 'Engenharia de Software',
@@ -251,7 +251,7 @@ const TEXTOS = {
         'sobre.fotoAlt': "Illustration representing Gilvan Pedro",
         'sobre.eyebrow': "Who's behind the site",
         'sobre.h1': "Hi, I'm <span class=\"gradient-text\">Gilvan Pedro</span>",
-        'sobre.p1': "I'm 18, from Brazil, and I study Software Engineering at SENAI Goiás. I've always loved technology, but what really drives me is taking an idea and turning it into something people actually use.",
+        'sobre.p1': "I'm {idade}, from Brazil, and I study Software Engineering at SENAI Goiás. I've always loved technology, but what really drives me is taking an idea and turning it into something people actually use.",
         'sobre.p2': "That's how Vtuber Search was born. There are so many talented Vtubers hidden behind the big names, and I wanted a place where they're easy to find: by type of content, schedule, platform and language, with room for the community itself to suggest new talent.",
         'sobre.p3': "My goal is to become a well-rounded developer, someone who masters logic and code but also knows how to listen, observe and build experiences that make a difference. This is only the beginning, and the site will keep growing along with me.",
         'sobre.curso': 'Software Engineering',
@@ -283,9 +283,25 @@ const TEXTOS = {
     }
 };
 
+// Idade do autor (página Sobre), calculada pela data de nascimento no fuso de Brasília:
+// muda sozinha todo 31 de julho, sem precisar editar o texto.
+const NASCIMENTO_DO_AUTOR = { ano: 2006, mes: 7, dia: 31 };
+
+function idadeDoAutor(agora = new Date()) {
+    const hoje = Object.fromEntries(new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Sao_Paulo', year: 'numeric', month: 'numeric', day: 'numeric'
+    }).formatToParts(agora).map(p => [p.type, Number(p.value)]));
+    const { ano, mes, dia } = NASCIMENTO_DO_AUTOR;
+    const jaFezAniversario = hoje.month > mes || (hoje.month === mes && hoje.day >= dia);
+    return hoje.year - ano - (jaFezAniversario ? 0 : 1);
+}
+
+// Valores que qualquer texto pode usar como {nome} (ex.: {idade})
+const VARIAVEIS_DOS_TEXTOS = { idade: idadeDoAutor() };
+
 function t(chave, variaveis = {}) {
     const texto = TEXTOS[IDIOMA][chave] ?? TEXTOS.pt[chave] ?? chave;
-    return texto.replace(/\{(\w+)\}/g, (_, nome) => variaveis[nome] ?? '');
+    return texto.replace(/\{(\w+)\}/g, (_, nome) => variaveis[nome] ?? VARIAVEIS_DOS_TEXTOS[nome] ?? '');
 }
 
 function traduzirPagina(raiz = document) {
