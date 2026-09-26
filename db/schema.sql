@@ -47,6 +47,15 @@ ALTER TABLE vtubers ADD COLUMN IF NOT EXISTS inscritos_youtube INTEGER;
 ALTER TABLE vtubers ADD COLUMN IF NOT EXISTS estatisticas_em TIMESTAMPTZ;
 ALTER TABLE vtubers ADD COLUMN IF NOT EXISTS seguidores_kick INTEGER;
 
+-- Imagens do próprio site (logo, foto do About), guardadas no banco em vez de arquivos no repositório.
+-- Envie/troque com: npm run imagem-do-site -- <nome> <arquivo>
+CREATE TABLE IF NOT EXISTS imagens_site (
+    nome          TEXT PRIMARY KEY,
+    mime          TEXT NOT NULL,
+    dados         BYTEA NOT NULL,
+    atualizado_em TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 -- Opções cadastráveis pelo painel, separadas por grupo:
 --   'tags' (conteúdo), 'plataforma' e 'idioma'. O id é gerado a partir do nome em português.
 CREATE TABLE IF NOT EXISTS tags (

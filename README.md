@@ -82,7 +82,8 @@ conhecidas, com busca, filtros, perfis completos e um painel para cadastrar tudo
   - todo dia às 6h de Brasília, pelo Cron Job da Vercel.
 
   Se uma API falhar, o último número salvo é mantido.
-- **Imagens** ficam no banco, em WEBP, em três tamanhos: `card` (lista), `mini` (painel) e `perfil`. As URLs levam a
+- **Todas as imagens ficam no banco**, inclusive a logo e a foto do About (tabela `imagens_site`, rota
+  `/api/site-imagem?nome=…`); o repositório não tem pasta de imagens. As das Vtubers ficam em WEBP, em três tamanhos: `card` (lista), `mini` (painel) e `perfil`. As URLs levam a
   versão da imagem, então podem ficar em cache para sempre.
 
 ---
@@ -126,7 +127,6 @@ conhecidas, com busca, filtros, perfis completos e um painel para cadastrar tudo
 │   ├── schema.sql              # Tabelas (pode rodar várias vezes; só adiciona o que falta)
 │   └── seed.json               # 16 Vtubers iniciais
 ├── scripts/                    # Servidor local, seed, migração e utilitários (ver "Scripts")
-├── img/                        # Logo, foto do About e imagens originais usadas no seed
 ├── vercel.json                 # Rota /admin, cabeçalhos e Cron Job
 └── .env.example                # Modelo das variáveis de ambiente
 ```
@@ -197,7 +197,8 @@ Tudo cabe nos planos gratuitos.
 | Comando | O que faz |
 |---|---|
 | `npm run dev` | Servidor local (site + API) em `http://localhost:3000`. |
-| `npm run seed` | Cria as tabelas e importa as Vtubers de `db/seed.json`, com as imagens de `img/`. |
+| `npm run seed` | Cria as tabelas e importa as Vtubers de `db/seed.json` (sem imagens; elas são enviadas pelo painel). |
+| `npm run imagem-do-site -- <nome> <arquivo>` | Envia ou troca uma imagem do próprio site no banco (`logo` ou `eu`, a foto do About). |
 | `npm run migrar` | Aplica o `db/schema.sql` no banco (só adiciona tabelas/colunas que faltam; não apaga dados). |
 | `npm run otimizar-imagens` | Converte as imagens já salvas para WEBP e gera as miniaturas do painel. |
 | `npm run atualizar-estatisticas` | Atualiza agora os seguidores/inscritos de todas as Vtubers no banco. |
@@ -213,6 +214,7 @@ Definido em `db/schema.sql`. Sempre que ele mudar, rode `npm run migrar`.
 |---|---|
 | `vtubers` | Nome, cor, bio (PT/EN), tags, plataformas, idiomas, horários (por fuso) e agenda, redes, momentos do criador, seguidores (Twitch/Kick) e inscritos (YouTube). |
 | `imagens` | Imagens em WEBP (`card`, `mini`, `perfil`) de cada Vtuber. |
+| `imagens_site` | Imagens do próprio site: `logo` (cabeçalho, ícone da aba e home) e `eu` (foto do About). |
 | `tags` | Opções cadastráveis pelo painel, por grupo: `tags` (conteúdo), `plataforma` e `idioma`, com nomes em PT e EN. |
 
 ---

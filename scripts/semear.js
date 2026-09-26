@@ -8,10 +8,16 @@ import { opcoesPorGrupo } from '../lib/tags.js';
 const raiz = new URL('../', import.meta.url);
 const MIMES = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif' };
 
+// As imagens originais ficavam na pasta img/, que saiu do repositório (as imagens agora ficam no banco).
+// Se o arquivo não existir, a vtuber é importada sem imagem.
 async function dataUrl(caminho) {
-    const dados = await readFile(new URL(caminho, raiz));
-    const mime = MIMES[caminho.split('.').pop().toLowerCase()];
-    return `data:${mime};base64,${dados.toString('base64')}`;
+    try {
+        const dados = await readFile(new URL(caminho, raiz));
+        const mime = MIMES[caminho.split('.').pop().toLowerCase()];
+        return `data:${mime};base64,${dados.toString('base64')}`;
+    } catch {
+        return null;
+    }
 }
 
 export async function aplicarSchema() {
