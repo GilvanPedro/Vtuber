@@ -1373,6 +1373,7 @@ fieldset.filter-group {
 
 .stat-twitch i { color: #b58cff; }
 .stat-youtube i { color: #ff5a5a; }
+.stat-kick i { color: #53fc18; }
 
 /* Agenda de lives no perfil */
 .schedule {

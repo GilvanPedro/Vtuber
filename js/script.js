@@ -202,10 +202,11 @@ function formatarNumero(valor, compacto) {
         compacto ? { notation: 'compact', maximumFractionDigits: 1 } : {}).format(valor);
 }
 
-function renderEstatisticas({ twitch, youtube }) {
+function renderEstatisticas({ twitch, youtube, kick }) {
     const contadores = [
         [twitch, 'stat-twitch', 'bxl-twitch', t('stats.seguidores')],
-        [youtube, 'stat-youtube', 'bxl-youtube', t('stats.inscritos')]
+        [youtube, 'stat-youtube', 'bxl-youtube', t('stats.inscritos')],
+        [kick, 'stat-kick', 'bx-play-circle', t('stats.seguidoresKick')]
     ].filter(([valor]) => typeof valor === 'number');
     const el = document.getElementById('perfil-stats');
     if (!el) return;
@@ -220,7 +221,7 @@ function renderEstatisticas({ twitch, youtube }) {
 
 // Busca os números agora e de novo a cada 15 minutos enquanto a página estiver aberta.
 function acompanharEstatisticas(vt) {
-    if (!vt.redes.twitch && !vt.redes.youtube) return;
+    if (!vt.redes.twitch && !vt.redes.youtube && !vt.redes.kick) return;
     const atualizar = () => fetch(urlDoSite(`api/estatisticas?id=${encodeURIComponent(vt.id)}`))
         .then(r => (r.ok ? r.json() : null))
         .then(dados => dados && renderEstatisticas(dados))

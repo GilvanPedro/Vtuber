@@ -29,11 +29,12 @@ conhecidas, com busca, filtros, perfis completos e um painel para cadastrar tudo
 ### Para quem visita
 
 - **Catálogo** com busca pelo nome (ignora acentos) e filtros combináveis de **conteúdo, horário, plataforma e idioma**.
-- **Ordenação** por mais recentes, nome (A–Z), **mais seguidores** e **menos seguidores** (Twitch + YouTube somados).
+- **Ordenação** por mais recentes, nome (A–Z), **mais seguidores** e **menos seguidores** (Twitch + YouTube + Kick somados;
+  quem não tem conta numa plataforma conta como 0 nela).
 - **Paginação** de 6 linhas por página; só os cards da página atual são carregados. A busca, os filtros, a ordem e a
   página ficam na URL, então dá para compartilhar o link.
 - **Perfil de cada Vtuber** com arte, bio, tags, horários, redes sociais e:
-  - **seguidores na Twitch e inscritos no YouTube**, atualizados sozinhos;
+  - **seguidores na Twitch e na Kick e inscritos no YouTube**, atualizados sozinhos;
   - **horários das lives** convertidos para o fuso de quem visita;
   - **Momentos do criador**: vídeos, lives e Shorts do YouTube e clipes/vídeos da Twitch no mesmo lugar.
 - **Português ou inglês** (botão PT | EN) e **fuso horário** (Brasil, EUA Leste, EUA Pacífico ou Europa), escolhidos
@@ -65,7 +66,7 @@ conhecidas, com busca, filtros, perfis completos e um painel para cadastrar tudo
     │                                                     │  Vercel
     └──────► /api/*  (Vercel Functions, Node.js) ─────────┘
                  │         │
-                 │         ├──► Twitch API / YouTube Data API  (seguidores e inscritos)
+                 │         ├──► Twitch API / YouTube Data API / Kick  (seguidores e inscritos)
                  ▼
             Neon (PostgreSQL): vtubers, imagens, tags
 ```
@@ -74,7 +75,7 @@ conhecidas, com busca, filtros, perfis completos e um painel para cadastrar tudo
 - **Cache:** as respostas públicas (`/api/vtubers`, `/api/tags`, `/api/estatisticas`) ficam na CDN da Vercel com a tag
   `dados-publicos`. O painel apaga essa tag ao salvar, então as mudanças aparecem na hora sem que cada visita precise
   acordar o banco.
-- **Seguidores/inscritos** são guardados no banco e atualizados:
+- **Seguidores/inscritos** (Twitch, YouTube e Kick) são guardados no banco e atualizados:
   - ao abrir o perfil (com cache de 15 minutos);
   - ao montar a lista do catálogo (busca os que faltam ou têm mais de 20 h);
   - ao salvar a Vtuber no painel;
@@ -117,7 +118,7 @@ conhecidas, com busca, filtros, perfis completos e um painel para cadastrar tudo
 │   ├── vtubers.js              # Consultas e gravações de Vtubers e imagens
 │   ├── validar.js              # Validação dos dados do painel e dos links de vídeo
 │   ├── tags.js                 # Tags, plataformas e idiomas (sem repetição)
-│   ├── estatisticas.js         # Twitch / YouTube
+│   ├── estatisticas.js         # Twitch / YouTube / Kick
 │   ├── imagens.js              # Conversão para WEBP (sharp)
 │   ├── cache.js                # Cabeçalhos e limpeza do cache da CDN
 │   ├── auth.js  admin.js  http.js
@@ -164,7 +165,9 @@ Para gerar textos aleatórios (`SESSION_SECRET`, `CRON_SECRET`):
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-Sem as chaves da Twitch ou do YouTube, o contador daquela plataforma simplesmente não aparece.
+Sem as chaves da Twitch ou do YouTube, o contador daquela plataforma simplesmente não aparece. A **Kick não precisa de chave**:
+a API oficial dela não informa seguidores, então o site usa a rota que o próprio kick.com usa. Por não ser oficial, ela pode
+mudar; se falhar, o último número salvo é mantido.
 
 ---
 
@@ -198,7 +201,7 @@ Tudo cabe nos planos gratuitos.
 | `npm run migrar` | Aplica o `db/schema.sql` no banco (só adiciona tabelas/colunas que faltam; não apaga dados). |
 | `npm run otimizar-imagens` | Converte as imagens já salvas para WEBP e gera as miniaturas do painel. |
 | `npm run atualizar-estatisticas` | Atualiza agora os seguidores/inscritos de todas as Vtubers no banco. |
-| `npm run testar-estatisticas -- <links>` | Testa as chaves da Twitch/YouTube com links reais. |
+| `npm run testar-estatisticas -- <links>` | Testa o acesso à Twitch, ao YouTube e à Kick com links reais. |
 
 ---
 
@@ -208,7 +211,7 @@ Definido em `db/schema.sql`. Sempre que ele mudar, rode `npm run migrar`.
 
 | Tabela | Conteúdo |
 |---|---|
-| `vtubers` | Nome, cor, bio (PT/EN), tags, plataformas, idiomas, horários (por fuso) e agenda, redes, momentos do criador, seguidores/inscritos. |
+| `vtubers` | Nome, cor, bio (PT/EN), tags, plataformas, idiomas, horários (por fuso) e agenda, redes, momentos do criador, seguidores (Twitch/Kick) e inscritos (YouTube). |
 | `imagens` | Imagens em WEBP (`card`, `mini`, `perfil`) de cada Vtuber. |
 | `tags` | Opções cadastráveis pelo painel, por grupo: `tags` (conteúdo), `plataforma` e `idioma`, com nomes em PT e EN. |
 
@@ -238,7 +241,7 @@ no HTML ou `t('chave')` no JavaScript.
 - **Vercel Functions (Node.js)** para a API, com CDN, cache por tags e Cron Jobs
 - **Neon (PostgreSQL)** como banco de dados, pelo driver `@neondatabase/serverless`
 - **sharp** para converter as imagens para WEBP
-- **Twitch Helix API** e **YouTube Data API v3** para seguidores e inscritos
+- **Twitch Helix API**, **YouTube Data API v3** e a rota pública do kick.com para seguidores e inscritos
 - **PGlite** (Postgres em memória) para desenvolvimento local
 - **Web Audio API** para os sons do dado
 

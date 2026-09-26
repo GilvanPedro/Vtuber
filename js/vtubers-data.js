@@ -136,20 +136,24 @@ async function carregarVtuber(id) {
     return r.json();
 }
 
-// Seguidores na Twitch + inscritos no YouTube. Quem não tem conta (ou número) em uma plataforma conta como 0 nela.
+// Seguidores na Twitch + inscritos no YouTube + seguidores na Kick. Quem não tem conta (ou número) numa plataforma conta como 0 nela.
 function seguidoresTotais(vt) {
-    return (vt.seguidoresTwitch ?? 0) + (vt.inscritosYoutube ?? 0);
+    return (vt.seguidoresTwitch ?? 0) + (vt.inscritosYoutube ?? 0) + (vt.seguidoresKick ?? 0);
 }
 
 // Se há algum número conhecido (para decidir se o card mostra o total)
-const temSeguidores = vt => typeof vt.seguidoresTwitch === 'number' || typeof vt.inscritosYoutube === 'number';
+const temSeguidores = vt => [vt.seguidoresTwitch, vt.inscritosYoutube, vt.seguidoresKick].some(v => typeof v === 'number');
 
-// Dica do card: "12.345 seguidores na Twitch + 6.789 inscritos no YouTube"
+// Dica do card: "12.345 seguidores na Twitch + 6.789 inscritos no YouTube + 1.234 seguidores na Kick"
 function tituloSeguidores(vt) {
-    const partes = [];
-    if (typeof vt.seguidoresTwitch === 'number') partes.push(`${vt.seguidoresTwitch.toLocaleString(document.documentElement.lang)} ${typeof t === 'function' ? t('stats.seguidores') : 'seguidores na Twitch'}`);
-    if (typeof vt.inscritosYoutube === 'number') partes.push(`${vt.inscritosYoutube.toLocaleString(document.documentElement.lang)} ${typeof t === 'function' ? t('stats.inscritos') : 'inscritos no YouTube'}`);
-    return partes.join(' + ');
+    const texto = (chave, reserva) => (typeof t === 'function' ? t(chave) : reserva);
+    return [
+        [vt.seguidoresTwitch, texto('stats.seguidores', 'seguidores na Twitch')],
+        [vt.inscritosYoutube, texto('stats.inscritos', 'inscritos no YouTube')],
+        [vt.seguidoresKick, texto('stats.seguidoresKick', 'seguidores na Kick')]
+    ].filter(([valor]) => typeof valor === 'number')
+        .map(([valor, rotuloStat]) => `${valor.toLocaleString(document.documentElement.lang)} ${rotuloStat}`)
+        .join(' + ');
 }
 
 const formatarCompacto = valor => new Intl.NumberFormat(document.documentElement.lang || 'pt-BR',

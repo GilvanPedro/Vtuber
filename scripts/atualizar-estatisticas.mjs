@@ -13,5 +13,5 @@ const fmt = v => (v == null ? '—' : v.toLocaleString('pt-BR'));
 for (const vt of await vtubersComRedes()) {
     const r = await atualizarEstatisticas(vt.id, vt.redes);
     const aviso = Object.entries(r.falhas).filter(([p, f]) => f && vt.redes[p]).map(([p]) => `falhou ${p}`).join(', ');
-    console.log(`${vt.id.padEnd(22)} Twitch ${fmt(r.twitch).padStart(10)}   YouTube ${fmt(r.youtube).padStart(12)}   ${aviso}`);
+    console.log(`${vt.id.padEnd(22)} Twitch ${fmt(r.twitch).padStart(10)}   YouTube ${fmt(r.youtube).padStart(12)}   Kick ${fmt(r.kick).padStart(10)}   ${aviso}`);
 }
