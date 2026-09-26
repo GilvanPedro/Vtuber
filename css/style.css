@@ -56,15 +56,24 @@ body {
     display: flex;
     flex-direction: column;
     background: var(--bg);
-    background-image:
-        radial-gradient(900px 500px at 10% -10%, rgba(228, 95, 217, 0.14), transparent 60%),
-        radial-gradient(800px 500px at 100% 0%, rgba(107, 227, 245, 0.08), transparent 60%);
-    background-attachment: fixed;
     color: var(--text);
     font-family: var(--font-body);
     font-size: 1rem;
     line-height: 1.65;
     -webkit-font-smoothing: antialiased;
+}
+
+/* Brilho de fundo fixo numa camada própria. (Usar "background-attachment: fixed" no body fazia o Chrome
+   deixar partes da tela sem redesenhar, como imagens de cards que só apareciam ao passar o mouse.) */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        radial-gradient(900px 500px at 10% -10%, rgba(228, 95, 217, 0.14), transparent 60%),
+        radial-gradient(800px 500px at 100% 0%, rgba(107, 227, 245, 0.08), transparent 60%);
 }
 
 main {
@@ -384,7 +393,13 @@ h3 {
     height: 100%;
     object-fit: contain;
     object-position: bottom;
-    transition: transform 0.35s;
+    opacity: 0;
+    transition: transform 0.35s, opacity 0.3s;
+}
+
+/* A imagem aparece (com fade) quando termina de carregar; isso também força o navegador a desenhá-la. */
+.vt-card.imagem-pronta .vt-card-media img {
+    opacity: 1;
 }
 
 .vt-card:hover .vt-card-media img {

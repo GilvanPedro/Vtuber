@@ -15,7 +15,7 @@ if (recentes) {
     recentes.replaceChildren(...cardsCarregando(6));
     carregarVtubers()
         .then(lista => {
-            recentes.replaceChildren(...lista.slice(0, 6).map(criarCardVtuber));
+            recentes.replaceChildren(...lista.slice(0, 6).map(vt => criarCardVtuber(vt, { prioridade: true })));
             document.getElementById('total-vtubers').textContent = lista.length;
             document.getElementById('total-plataformas').textContent = Object.keys(FILTROS.plataforma.opcoes).length;
         })

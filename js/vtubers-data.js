@@ -159,8 +159,9 @@ function tituloSeguidores(vt) {
 const formatarCompacto = valor => new Intl.NumberFormat(document.documentElement.lang || 'pt-BR',
     { notation: 'compact', maximumFractionDigits: 1 }).format(valor);
 
-/* Card usado na lista e na home. Retorna um <a> pronto para inserir. */
-function criarCardVtuber(vt) {
+/* Card usado na lista e na home. Retorna um <a> pronto para inserir.
+   prioridade: carrega a imagem na hora (sem "lazy"), para cards que já aparecem logo, como os da home. */
+function criarCardVtuber(vt, { prioridade = false } = {}) {
     const card = document.createElement('a');
     card.className = 'vt-card';
     card.href = urlPerfil(vt.id);
@@ -174,7 +175,7 @@ function criarCardVtuber(vt) {
     const tags = vt.tags.slice(0, 3).map(t => `<span class="chip">${rotulo('tags', t)}</span>`).join('');
     const extra = vt.tags.length > 3 ? `<span class="chip">+${vt.tags.length - 3}</span>` : '';
     const imagem = vt.img
-        ? `<img src="${esc(urlDoSite(vt.img.replace(/^\//, '')))}" alt="${esc(vt.nome)}" loading="lazy" decoding="async">`
+        ? `<img src="${esc(urlDoSite(vt.img.replace(/^\//, '')))}" alt="${esc(vt.nome)}" ${prioridade ? 'fetchpriority="high"' : 'loading="lazy"'}>`
         : '';
 
     card.innerHTML = `
@@ -188,6 +189,15 @@ function criarCardVtuber(vt) {
             </div>
             <div class="vt-card-tags">${tags}${extra}</div>
         </div>`;
+    const img = card.querySelector('.vt-card-media img');
+    if (img) {
+        const mostrar = () => card.classList.add('imagem-pronta');
+        if (img.complete && img.naturalWidth) mostrar();
+        else {
+            img.addEventListener('load', mostrar, { once: true });
+            img.addEventListener('error', mostrar, { once: true });
+        }
+    }
     return card;
 }
 

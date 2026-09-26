@@ -125,7 +125,7 @@ function render() {
 
     const inicio = (estado.pagina - 1) * tamanho;
     const pagina = lista.slice(inicio, inicio + tamanho);
-    grid.replaceChildren(...pagina.map(criarCardVtuber));
+    grid.replaceChildren(...pagina.map(vt => criarCardVtuber(vt)));
 
     const ativos = GRUPOS.reduce((soma, g) => soma + estado.filtros[g].size, 0);
     filtrosCount.textContent = ativos || '';
