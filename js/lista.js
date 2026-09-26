@@ -94,14 +94,9 @@ function filtrar() {
     if (estado.ordem === 'az') {
         lista.sort((a, b) => a.nome.localeCompare(b.nome, document.documentElement.lang));
     } else if (estado.ordem === 'mais-seguidores' || estado.ordem === 'menos-seguidores') {
-        // Soma Twitch + YouTube; quem não tem nenhum número vai para o fim nas duas ordens.
+        // Soma Twitch + YouTube (o que não existir conta como 0)
         const sinal = estado.ordem === 'mais-seguidores' ? -1 : 1;
-        lista.sort((a, b) => {
-            const ta = seguidoresTotais(a);
-            const tb = seguidoresTotais(b);
-            if (ta == null || tb == null) return (ta == null) - (tb == null);
-            return sinal * (ta - tb);
-        });
+        lista.sort((a, b) => sinal * (seguidoresTotais(a) - seguidoresTotais(b)));
     }
     return lista;
 }

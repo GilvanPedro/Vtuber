@@ -136,11 +136,13 @@ async function carregarVtuber(id) {
     return r.json();
 }
 
-// Seguidores na Twitch + inscritos no YouTube (null se nenhum dos dois é conhecido)
+// Seguidores na Twitch + inscritos no YouTube. Quem não tem conta (ou número) em uma plataforma conta como 0 nela.
 function seguidoresTotais(vt) {
-    const valores = [vt.seguidoresTwitch, vt.inscritosYoutube].filter(v => typeof v === 'number');
-    return valores.length ? valores.reduce((a, b) => a + b, 0) : null;
+    return (vt.seguidoresTwitch ?? 0) + (vt.inscritosYoutube ?? 0);
 }
+
+// Se há algum número conhecido (para decidir se o card mostra o total)
+const temSeguidores = vt => typeof vt.seguidoresTwitch === 'number' || typeof vt.inscritosYoutube === 'number';
 
 // Dica do card: "12.345 seguidores na Twitch + 6.789 inscritos no YouTube"
 function tituloSeguidores(vt) {
@@ -178,7 +180,7 @@ function criarCardVtuber(vt) {
             <div class="vt-card-meta">
                 <span>${plataformas}</span>
                 <span><i class='bx bx-globe'></i>${idiomas}</span>
-                ${total == null ? '' : `<span class="vt-card-seguidores" title="${esc(tituloSeguidores(vt))}"><i class='bx bx-group'></i>${formatarCompacto(total)}</span>`}
+                ${!temSeguidores(vt) ? '' : `<span class="vt-card-seguidores" title="${esc(tituloSeguidores(vt))}"><i class='bx bx-group'></i>${formatarCompacto(total)}</span>`}
             </div>
             <div class="vt-card-tags">${tags}${extra}</div>
         </div>`;
